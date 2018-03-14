@@ -69,11 +69,6 @@ def pullData(pv, start, end):
 # base_times is an array of time data in the time-since-epoch format (presumably the time in seconds from the date that the original Star Wars came out) 
 # This first example uses a BPM in LI24, but you can change it to whatever you like.
 
-fieldsbad = [
-             'GDET:FEE1:241:ENRCHSTBR',
-             'charge',
-             'current'
-             ]
 
 fields = [
           'BEND:DMP1:400:BDES',
@@ -96,9 +91,6 @@ fields = [
           'QUAD:LI26:701:BCTRL',
           'QUAD:LI26:801:BCTRL',
           'QUAD:LI26:901:BCTRL',
-          'timestamps',
-          'ts',
-#          'GDET:FEE1:241:ENRC'
           ]
 
 for field in fields:

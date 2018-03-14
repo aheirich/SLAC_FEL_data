@@ -28,7 +28,7 @@ import os
 
 # run ocelotscraper.py first
 months = ["2017-05","2017-06","2017-07","2017-08","2017-09","2017-10","2017-11","2017-12"]
-df_pickles = ["ocelotscrapes_" + month + ".pkl" for month in months]
+df_pickles = ["ocelotscrapes/ocelotscrapes_" + month + ".pkl" for month in months]
 print 'df_pickles', df_pickles
 
 

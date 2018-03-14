@@ -44,7 +44,7 @@ def newDataRow(fields, value):
 
 
 def recordData(date, time, value, fields, data):
-  key = date + "T" + time
+  key = date + "---" + time
   if key not in data.keys():
     data[key] = newDataRow(fields, value)
   else:

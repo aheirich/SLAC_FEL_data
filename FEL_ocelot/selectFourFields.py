@@ -8,7 +8,7 @@
 import sys
 
 
-fields = [ ' charge', ' current', ' timestamps', ' GDET_FEE1_241_ENRCHSTBR' ]
+fields = [ ' QUAD_LI26_201_BCTRL', ' charge', ' current', ' timestamps', ' GDET_FEE1_241_ENRCHSTBR' ]
 index = []
 
 for line in sys.stdin:
