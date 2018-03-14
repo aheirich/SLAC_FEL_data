@@ -67,7 +67,7 @@ def propagateForward(data):
 
 
 def reportData(fields, data):
-  header  = ','.join(fields)
+  header  = ' , ' + ','.join(fields)
   print header
   for key in sorted(data.keys()):
     row = ','.join(data[key])

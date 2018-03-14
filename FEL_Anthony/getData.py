@@ -96,7 +96,9 @@ fields = [
           'QUAD:LI26:701:BCTRL',
           'QUAD:LI26:801:BCTRL',
           'QUAD:LI26:901:BCTRL',
-          'GDET:FEE1:241:ENRC'
+          'timestamps',
+          'ts',
+#          'GDET:FEE1:241:ENRC'
           ]
 
 for field in fields:
