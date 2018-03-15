@@ -1,5 +1,5 @@
 #
-# selectFourFields.py
+# selectFields.py
 #
 # read an output file produced by extract.py
 # pull out four desired fields to combine with the Anthony script data
@@ -8,7 +8,7 @@
 import sys
 
 
-fields = [ ' QUAD_LI26_201_BCTRL', ' charge', ' current', ' timestamps', ' GDET_FEE1_241_ENRCHSTBR' ]
+fields = [ ' QUAD_LI26_201_BCTRL', ' QUAD_LI26_301_BCTRL', ' QUAD_LI26_401_BCTRL', ' QUAD_LI26_501_BCTRL', ' charge', ' current', ' timestamps', ' GDET_FEE1_241_ENRCHSTBR' ]
 index = []
 
 for line in sys.stdin:

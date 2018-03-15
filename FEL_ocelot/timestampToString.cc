@@ -9,14 +9,19 @@
 #include <string.h>
 #include <time.h>
 
+const unsigned LINE_SIZE = 4 * 1024;
 
-void convertTimestamp(char line[]) {
-  char *lastComma = line + strlen(line) - 1;
+void convertTimestamp(char line[], unsigned numCommaSkips) {
+  char *lastComma = line + strlen(line);
+  for(unsigned i = 0; i < numCommaSkips; ++i) {
+    lastComma--;
+    while(*lastComma != ',') lastComma--;
+  }
   char *penultimateComma = lastComma - 1;
   while(*penultimateComma != ',' && penultimateComma > line) {
     penultimateComma--;
   }
-  char newline[512];
+  char newline[LINE_SIZE];
   strncpy(newline, line, penultimateComma - line + 1);
   time_t timestamp;
   double doubleTime;
@@ -32,16 +37,20 @@ void convertTimestamp(char line[]) {
 
 
 int main(int argc, char *argv[]) {
-  char line[512];
-  bool first = true;
+  
+  unsigned numCommaSkips = 1;
+  if(argc > 1) sscanf(argv[1], "%d", &numCommaSkips);
+  
+  char line[LINE_SIZE];
+  unsigned lineCount = 0;
   while(gets(line)) {
+    lineCount++;
     // skip first header line
-    if(first) {
-      first = false;
-      printf("%s", line);
+    if(lineCount <= 2) {
+      printf("%s\n", line);
       continue;
     }
-    convertTimestamp(line);
+    convertTimestamp(line, numCommaSkips);
     printf("%s\n", line);
   }
   return 0;

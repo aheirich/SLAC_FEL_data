@@ -1,5 +1,5 @@
 
-all:	fourFieldsTimestamped.csv
+all:	selectedFields.csv
 
 ocelotscrapes:	ocelotscrapes.zip
 	mkdir -p ocelotscrapes
@@ -8,15 +8,16 @@ ocelotscrapes:	ocelotscrapes.zip
 data.log:	extract.py ocelotscrapes
 	python extract.py > data.log
 
-fourFields.csv:	data.log
-	cat data.log | python selectFourFields.py > fourFields.csv
+data_timestamped.log: data.log timestampToString
+	cat data.log | ./timestampToString 2 > data_timestamped.log
+
+selectedFields.csv:	data_timestamped.log
+	cat data_timestamped.log | python selectFields.py > selectedFields.csv
 
 timestampToString:  timestampToString.cc
-	g++ -o timestampToString timestampToString.cc
+	g++ -g -o timestampToString timestampToString.cc
 
-fourFieldsTimestamped.csv:  fourFields.csv timestampToString
-	cat fourFields.csv | ./timestampToString > fourFieldsTimestamped.csv
 
 clean:
-	rm -rf data.log fourFields.csv ocelotscrapes timestampToString fourFieldsTimestamped.csv
+	rm -rf data.log selectedFields.csv ocelotscrapes timestampToString
 

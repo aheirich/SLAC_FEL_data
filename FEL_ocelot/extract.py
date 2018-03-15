@@ -48,7 +48,6 @@ if 'df_pickles' in locals():
     # print quads
     quads = keys[np.array([key[:4]=='QUAD' for key in keys])]
     quads = [quad.replace(":","_") for quad in quads]
-    print "quads: ", quads
     rows, columns = df.shape
     for r in range(rows):
       string = ""
