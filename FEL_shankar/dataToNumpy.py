@@ -81,7 +81,7 @@ def dateTimeKey(date, time, offset):
 
 
 def recordData(date, time, offset, value, fields, data):
-  key = dateTimeKey(date, time, offset)
+  key = dateTimeKey(date,  time, offset)
   if key not in data.keys():
     data[key] = newDataRow(fields, value)
   else:
@@ -113,22 +113,33 @@ def reportData(fields, data):
   print ']'
 
 
+lineCount = 0
+
 for line in fileinput.input():
   words = line.split(' ')
-  
+
   if words[0] == 'FIELD':
     ensureUniformRowLength(fields, data)
     field = remove_control_chars(words[1])
     fields.append(field)
+    print field
+    lineCount = 0
     continue
   
+  if len(words) < 4: continue
+
   date = words[0].strip()
   time = words[1].strip()
   offset = words[2].strip()
   value = float(words[3].strip())
   recordData(date, time, offset, value, fields, data)
 
+  lineCount = lineCount + 1
+  if lineCount % 10000 == 0: print "line", lineCount
+
+print 'ensureUniformRowLength'
 ensureUniformRowLength(fields, data)
+print 'propagateForward'
 propagateForward(data)
 reportData(fields, data)
 
