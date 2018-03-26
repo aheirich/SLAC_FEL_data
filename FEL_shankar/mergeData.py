@@ -15,9 +15,8 @@ MAX_DATETIME = "9999-99-99---99:99:99"
 def openInputFiles(argv):
   files = []
   for i in range(len(argv)):
-    if i != 0:
-      file = open(argv[i], "r")
-      files.append(file)
+    file = open(argv[i], "r")
+    files.append(file)
   return files
 
 
@@ -105,10 +104,18 @@ def readNext(files):
 
 
 
-def display(datetime, nextInputs):
+def isControl(name):
+  return not name.startswith('data/GDET') # pulse energy
+
+
+def display(datetime, nextInputs, isInput, files):
   data = [ datetime ]
-  for input in nextInputs:
-    data.append(input[1])
+  for i in range(len(nextInputs)):
+    input = nextInputs[i]
+    if isInput and isControl(files[i].name):
+      data.append(input[1])
+    elif not isInput and not isControl(files[i].name):
+      data.append(input[1])
   return data
 
 
@@ -135,8 +142,6 @@ def readAhead(file, i, nextInputs, lookAhead, previousDateTime):
 
 
 
-def isControl(name):
-  return not name.startswith('data/GDET') # pulse energy
 
 
 
@@ -163,38 +168,53 @@ def getNext(files, currentTime, nextInputs, lookAhead):
 
 
 
-
-print ''
-print 'import numpy'
-print ''
-print 'fields = [ \\'
+files = openInputFiles(sys.argv[1:])
+FEL_INPUT = open('FEL_INPUT.py', 'w')
+FEL_OUTPUT = open('FEL_OUTPUT.py', 'w')
+FEL_INPUT.write("import numpy\n")
+FEL_INPUT.write('fields = [\\\n')
+FEL_OUTPUT.write("import numpy\n")
 header = '"DATE_TIME", '
-
-files = openInputFiles(sys.argv)
-
 for file in files:
   words = file.name.split('/')
   header = header + '"' + words[1] + '", '
-print header
-print ']'
-print ''
-print 'training_data = numpy.array([ \\'
+FEL_INPUT.write(header + '\n')
+FEL_INPUT.write(']\n')
+FEL_INPUT.write('')
+FEL_INPUT.write('train_x = numpy.array([\\\n')
+FEL_OUTPUT.write('train_y = numpy.array([\\\n')
 
 nextInputs = readNext(files)
 lookAhead = readNext(files)
-lastOutput = ''
+lastDisplay = ''
 controlChanged = True
+trainingStartDate = "2017-07-01"
+testStartDate = "2017-12-01"
+inTest = False
 
 while True:
   currentTime = latestDateTime(nextInputs)
-  output = display(currentTime, nextInputs)
-  if output == lastOutput: break
-  lastOutput = output
+  inputDisplay = display(currentTime, nextInputs, True, files)
+  outputDisplay = display(currentTime, nextInputs, False, files)
+  fullDisplay = inputDisplay + outputDisplay
+  if fullDisplay == lastDisplay: break
+  lastDisplay = fullDisplay
   nextInputs, lookAhead, controlChanged = getNext(files, currentTime, nextInputs, lookAhead)
-  if controlChanged:
-    print output, ', \\'
-print output
+  
+  if controlChanged and currentTime >= trainingStartDate:
+    if currentTime >= testStartDate:
+      if not inTest:
+        inTest = True
+        FEL_INPUT.write('])\n\ntest_x = numpy.array([\\\n')
+        FEL_OUTPUT.write('])\n\ntest_y = numpy.array([\\\n')
+    FEL_INPUT.write('# ' + str(inputDisplay[0]) + '\n')
+    FEL_INPUT.write(str(inputDisplay[1:]) + ', \\\n')
+    FEL_OUTPUT.write('# ' + str(outputDisplay[0]) + '\n')
+    FEL_OUTPUT.write(str(outputDisplay[1:]) + ', \\\n')
 
-print '])'
-print ''
-
+for file in [FEL_INPUT, FEL_OUTPUT]:
+  file.write('])\n')
+  file.write('')
+  file.close()
+                     
+                     

@@ -1,7 +1,12 @@
-all: FEL_DATA.py
+all: FEL_INPUT.py FEL_OUTPUT.py
+
 
 data/GDET_FEE1_241_ENRC.txt:	data/assemble.bash data/GDET_FEE1_241_ENRC.txtaa
 	(cd data; ./assemble.bash)
 
-FEL_DATA.py:	data/GDET_FEE1_241_ENRC.txt mergeData.py
-	python mergeData.py data/*.txt > FEL_DATA.py
+FEL_INPUT.py:	mergeData.py
+FEL_OUTPUT.py:	mergeData.py
+	python mergeData.py data/*.txt
+
+clean:
+	rm -f FEL_OUTPUT.py FEL_INPUT.py
