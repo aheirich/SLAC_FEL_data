@@ -15,8 +15,8 @@ import FEL_OUTPUT
 
 numTrainingSamples = 100000
 numHiddenLayers = 10
-numHiddenUnitsPerLayer = 100
-batch_size = 256
+numHiddenUnitsPerLayer = 128
+batch_size = 128
 epochs = 1000
 
 
@@ -24,11 +24,9 @@ model = Sequential()
 
 for i in range(numHiddenLayers):
   if i == 0:
-    input_shape = (batch_size, len(FEL_INPUT.train_x[0]), 1)
-    print input_shape
-    model.add(Dense(numHiddenLayers, activation='relu', input_dim=len(FEL_INPUT.train_x[0])))
+    model.add(Dense(numHiddenUnitsPerLayer, activation='relu', input_dim=len(FEL_INPUT.train_x[0])))
   else:
-    model.add(Dense(numHiddenLayers, activation='relu'))
+    model.add(Dense(numHiddenUnitsPerLayer, activation='relu'))
 
 model.add(Dense(len(FEL_OUTPUT.train_y[0]), activation='relu'))
 
