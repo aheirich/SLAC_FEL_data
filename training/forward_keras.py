@@ -25,7 +25,6 @@ model = Sequential()
 for i in range(numHiddenLayers):
   if i == 0:
     input_shape = (batch_size, len(FEL_INPUT.train_x[0]), 1)
-    print input_shape
     model.add(Dense(numHiddenLayers, activation='relu', input_dim=len(FEL_INPUT.train_x[0])))
   else:
     model.add(Dense(numHiddenLayers, activation='relu'))
@@ -43,13 +42,12 @@ model.fit(FEL_INPUT.train_x, FEL_OUTPUT.train_y,
           validation_data=(FEL_INPUT.test_x, FEL_OUTPUT.test_y))
 
 score = mode.evaluate(FEL_INPUT.test_x, FEL_OUTPUT.test_y, verbose=0)
-print score
+print('score', score)
 
-print model.parameters()
 
 for layer in len(model.layers):
   weights = layer.get_weights()
-  print 'layer'
-  print 'weights', weights[0]
-  print 'biases', weights[1]
+  print('layer')
+  print('weights', weights[0])
+  print('biases', weights[1])
 
