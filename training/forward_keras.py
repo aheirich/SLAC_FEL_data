@@ -25,7 +25,7 @@ numTrainingSamples = 100000
 numHiddenLayers = 2
 numHiddenUnitsPerLayer = 1024
 batch_size = 128
-epochs = 1000
+epochs = 100
 
 print('numHiddenLayers', numHiddenLayers, 'unitsPerLayer', numHiddenUnitsPerLayer, 'batch_size', batch_size, 'epochs', epochs)
 
