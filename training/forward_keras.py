@@ -53,9 +53,10 @@ score = model.evaluate(FEL_INPUT.test_x, FEL_OUTPUT.test_y, verbose=0)
 print('score', score)
 
 
-for layer in len(model.layers):
+for layer in model.layers:
   weights = layer.get_weights()
   print('layer')
   print('weights', weights[0])
   print('biases', weights[1])
+
 
