@@ -12,13 +12,22 @@ from keras.optimizers import SGD
 import FEL_INPUT
 import FEL_OUTPUT
 
+repeatableResult = False
+usingTensorflow = True
+
+if repeatableResult:
+  numpy.random.seed(1)
+  if usingTensorflow:
+    from tensorflow import set_random_seed
+    set_random_seed(2)
 
 numTrainingSamples = 100000
-numHiddenLayers = 10
-numHiddenUnitsPerLayer = 128
+numHiddenLayers = 2
+numHiddenUnitsPerLayer = 1024
 batch_size = 128
 epochs = 1000
 
+print('numHiddenLayers', numHiddenLayers, 'unitsPerLayer', numHiddenUnitsPerLayer, 'batch_size', batch_size, 'epochs', epochs)
 
 model = Sequential()
 
@@ -40,7 +49,7 @@ model.fit(FEL_INPUT.train_x, FEL_OUTPUT.train_y,
           verbose=1,
           validation_data=(FEL_INPUT.test_x, FEL_OUTPUT.test_y))
 
-score = mode.evaluate(FEL_INPUT.test_x, FEL_OUTPUT.test_y, verbose=0)
+score = model.evaluate(FEL_INPUT.test_x, FEL_OUTPUT.test_y, verbose=0)
 print('score', score)
 
 
