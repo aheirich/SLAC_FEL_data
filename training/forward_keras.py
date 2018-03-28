@@ -50,13 +50,33 @@ model.fit(FEL_INPUT.train_x, FEL_OUTPUT.train_y,
           validation_data=(FEL_INPUT.test_x, FEL_OUTPUT.test_y))
 
 score = model.evaluate(FEL_INPUT.test_x, FEL_OUTPUT.test_y, verbose=0)
-print('score', score)
+print('# score', score)
+
+print('import numpy')
+
+def print1D(array):
+  string = '['
+  for value in array: string = string + str(value) + ','
+  string = string + '],'
+  print(string)
+
+def print2D(array):
+  for row in array:
+    print1D(row)
 
 
+i = 0
 for layer in model.layers:
   weights = layer.get_weights()
-  print('layer')
-  print('weights', weights[0])
-  print('biases', weights[1])
+  print('layer-' + str(i))
+  print('weight_' + str(i) + ' = numpy.array([')
+  print1D(weights[0])
+  print('])')
+  print('')
+  print('bias_' + str(i) + ' = numpy.array(')
+  print2D(weights[1])
+  print(')')
+  i = i + 1
+
 
 
