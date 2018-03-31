@@ -174,7 +174,7 @@ FEL_OUTPUT = open('FEL_OUTPUT.py', 'w')
 FEL_INPUT.write("import numpy\n")
 FEL_INPUT.write('fields = [\\\n')
 FEL_OUTPUT.write("import numpy\n")
-header = '"DATE_TIME", '
+header = ''
 for file in files:
   words = file.name.split('/')
   header = header + '"' + words[1] + '", '

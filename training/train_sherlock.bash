@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=trainFEL
-#SBATCH --time=01:30:00
+#SBATCH --time=08:00:00
 #SBATCH -p aaiken
 #SBATCH --gres gpu:1
 #SBATCH --nodes=1
@@ -9,5 +9,13 @@ source ${HOME}/setup.bash
 module load py-keras
 module load py-tensorflow
 cd ${HOME}/SLAC_FEL_data/training
-python forward_keras.py
+
+for NUM_HIDDEN_LAYERS in 1 2 3 4 5 6 7 8
+do
+  for NUM_HIDDEN_UNITS_PER_LAYER in 128 256 512
+  do
+    python forward_keras.py ${NUM_HIDDEN_LAYERS} ${NUM_HIDDEN_UNITS_PER_LAYER}
+  done
+done
+
 
