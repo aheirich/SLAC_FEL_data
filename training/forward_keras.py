@@ -69,11 +69,11 @@ datfile.write( '# score' + str(score) + '\n')
 datfile.write("# numHiddenLayers " + str(numHiddenLayers) + " numHiddenUnitsPerLayer " + str(numHiddenUnitsPerLayer) + "\n")
 modfile.write( '# score' + str(score) + '\n')
 
-modfile.write( '\n')
+modfile.write( '\n#\n')
 modfile.write( 'param numHiddenLayers ;\n')
 modfile.write( 'param numHiddenUnitsPerLayer ;\n')
 
-datfile.write( '\n')
+datfile.write( '\n#\n')
 datfile.write( 'param numHiddenLayers := ' + str(numHiddenLayers) + ' ;\n')
 datfile.write( 'param numHiddenUnitsPerLayer := ' + str(numHiddenUnitsPerLayer) + ' ;\n')
 
@@ -94,17 +94,16 @@ def print2D(file, array):
   file.write( ';\n\n')
 
 
-modfile.write('# len(model.layers) = ' + str(len(model.layers)) + '\n')
 
 outputSize = len(model.layers[-1].get_weights()[0][0])
-modfile.write('param y_target{i in 1..' + str(outputSize) + '};\n')
+modfile.write('\nparam y_target{i in 1..' + str(outputSize) + '};\n\n')
 
 i = 0
 for layer in model.layers:
   weights = layer.get_weights()
 
-  modfile.write( '# layer-' + str(i) + '\n')
-  datfile.write( '# layer-' + str(i) + '\n')
+  modfile.write( '\n# layer-' + str(i) + '\n')
+  datfile.write( '\n# layer-' + str(i) + '\n')
 
   rows = len(weights[0])
   columns = len(weights[0][0])
@@ -125,19 +124,25 @@ for layer in model.layers:
   datfile.write( 'param bias_' + str(i) + ' :=\n')
   print1D(datfile, weights[1])
 
-  modfile.write('var a' + str(i) + '{i in 1..columns' + str(i) + '};\n')
+  modfile.write('# activations\n')
+  modfile.write('var a' + str(i) + '{i in 1..columns' + str(i) + '};\n\n')
 
   if i > 0:
-    modfile.write('var z' + str(i) + '{i in 1..columns' + str(i) + '};\n')
+    modfile.write('# preactivations\n')
+    modfile.write('var z' + str(i) + '{i in 1..columns' + str(i) + '};\n\n')
+    modfile.write('# range constraints\n')
     modfile.write('subject to rangemax' + str(i) + '{i in 1..columns' + str(i) + '}: z' + str(i) + '[i] <= 1;\n')
     modfile.write('subject to rangemin' + str(i) + '{i in 1..columns' + str(i) + '}: z' + str(i) + '[i] >= -1;\n')
+    modfile.write('\n# compute preactivations\n')
     modfile.write('subject to zassign' + str(i) + '{i in 1..columns' + str(i) + '}:\n')
     modfile.write('  z' + str(i) + '[i] = sum{j in 1..columns' + str(i - 1) + '} (weight_' + str(i) + '[j, i] * z' + str(i - 1) + '[j]) + bias_' + str(i) + '[i];\n')
+    modfile.write('\n# compute activations\n')
     modfile.write('subject to activation' + str(i) + '{i in 1..columns' + str(i) + '}:\n')
     modfile.write('  a' + str(i) + '[i] = z' + str(i) + '[i] * (tanh(100.0*z' + str(i) + '[i]) + 1) * 0.5;\n')
 
   i = i + 1
 
+modfile.write('\n# output layer constraint\n')
 outputLayer = len(model.layers) - 1
 modfile.write('subject to zclampPositive' + str(outputLayer) + '{i in 1..columns' + str(outputLayer) + '}:\n')
 modfile.write('  z' + str(outputLayer) + '[i] = if y_target[i] > 0 then y_target[i] else z' + str(outputLayer) + '[i];\n')
