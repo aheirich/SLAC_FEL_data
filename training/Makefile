@@ -15,7 +15,7 @@ duplicates.txt: FEL_INPUT.py
 	  > duplicates.txt
 
 duplicates.log: duplicates.txt FEL_OUTPUT.py fel_input.py
-	source duplicates.bash
+	bash duplicates.bash
 
 clean:
 	rm -f duplicates.txt duplicates.log fel_input.py duplicate_timestamps.txt
