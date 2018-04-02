@@ -168,6 +168,31 @@ def getNext(files, currentTime, nextInputs, lookAhead):
 
 
 
+def smoothed(series, file):
+  sum = []
+  for i in series[0]: sum.append(0.0)
+  counter = 0
+  i = 0
+  for row in series:
+    i = i + 1
+    if i <= len(series) / 2: continue
+    counter = counter + 1
+    for j in range(len(row)):
+      if j == 0:
+        sum[j] = row[j]
+      else:
+        sum[j] = sum[j] + float(row[j])
+  result = []
+  for i in range(len(sum)):
+    if i == 0:
+      result.append(sum[i])
+    else:
+      result.append(sum[i] / counter)
+:  return result
+
+
+
+
 files = openInputFiles(sys.argv[1:])
 FEL_INPUT = open('FEL_INPUT.py', 'w')
 FEL_OUTPUT = open('FEL_OUTPUT.py', 'w')
@@ -191,26 +216,37 @@ controlChanged = True
 trainingStartDate = "2017-07-01"
 testStartDate = "2017-12-01"
 inTest = False
+outputSeries = []
+printEveryDataPoint = False # debug feature
+first = True
 
 while True:
   currentTime = latestDateTime(nextInputs)
   inputDisplay = display(currentTime, nextInputs, True, files)
   outputDisplay = display(currentTime, nextInputs, False, files)
+  outputSeries.append(outputDisplay)
   fullDisplay = inputDisplay + outputDisplay
   if fullDisplay == lastDisplay: break
   lastDisplay = fullDisplay
   nextInputs, lookAhead, controlChanged = getNext(files, currentTime, nextInputs, lookAhead)
   
-  if controlChanged and currentTime >= trainingStartDate:
+  if (controlChanged and currentTime >= trainingStartDate) or printEveryDataPoint:
     if currentTime >= testStartDate:
       if not inTest:
         inTest = True
         FEL_INPUT.write('])\n\ntest_x = numpy.array([\\\n')
         FEL_OUTPUT.write('])\n\ntest_y = numpy.array([\\\n')
-    FEL_INPUT.write('# ' + str(inputDisplay[0]) + '\n')
-    FEL_INPUT.write(str(inputDisplay[1:]) + ', \\\n')
-    FEL_OUTPUT.write('# ' + str(outputDisplay[0]) + '\n')
-    FEL_OUTPUT.write(str(outputDisplay[1:]) + ', \\\n')
+  
+    if not first:
+      FEL_INPUT.write('# ' + str(inputDisplay[0]) + '\n')
+      FEL_INPUT.write(str(inputDisplay[1:]) + ', \\\n')
+      
+      FEL_OUTPUT.write('# ' + str(outputDisplay[0]) + '\n')
+      smoothedOutputDisplay = smoothed(outputSeries, FEL_OUTPUT)
+      FEL_OUTPUT.write(str(smoothedOutputDisplay[1:]) + ', \\\n')
+
+    outputSeries = []
+    first = False
 
 for file in [FEL_INPUT, FEL_OUTPUT]:
   file.write('])\n')

@@ -6,7 +6,7 @@ data/GDET_FEE1_241_ENRC.txt:	data/assemble.bash data/GDET_FEE1_241_ENRC.txtaa
 
 FEL_INPUT.py:	mergeData.py
 FEL_OUTPUT.py:	mergeData.py
-	python mergeData.py data/*.txt
+	python mergeData.py data/BEND*.txt data/QUAD*.txt data/GDET_FEE1_24*.txt
 
 clean:
 	rm -f FEL_OUTPUT.py FEL_INPUT.py
