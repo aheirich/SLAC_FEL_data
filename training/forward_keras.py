@@ -26,13 +26,16 @@ numTrainingSamples = 100000
 numHiddenLayers = 2
 numHiddenUnitsPerLayer = 1024
 batch_size = 128
-epochs = 50
+epochs = 25
+learningRate = 0.0
 
-if len(argv) == 3:
+if len(argv) >= 3:
   numHiddenLayers = int(argv[1])
   numHiddenUnitsPerLayer = int(argv[2])
+if len(argv) >= 4:
+  learningRate = float(argv[3])
 
-print('numHiddenLayers', numHiddenLayers, 'unitsPerLayer', numHiddenUnitsPerLayer, 'batch_size', batch_size, 'epochs', epochs)
+print('numHiddenLayers', numHiddenLayers, 'unitsPerLayer', numHiddenUnitsPerLayer, 'batch_size', batch_size, 'epochs', epochs, 'learningRate', learningRate)
 
 model = Sequential()
 
@@ -45,7 +48,7 @@ for i in range(numInputLayers + numHiddenLayers):
 
 model.add(Dense(len(FEL_OUTPUT.train_y[0]), activation='relu'))
 
-model.compile(loss=mse, optimizer=SGD(lr=0.01),
+model.compile(loss=mse, optimizer=SGD(lr=learningRate),
               metrics=['accuracy'])
 
 
@@ -93,7 +96,7 @@ def print2D(file, array):
 
 modfile.write('# len(model.layers) = ' + str(len(model.layers)) + '\n')
 
-outputSize = model.layers[:-1].get_weights()[0][0]
+outputSize = len(model.layers[-1].get_weights()[0][0])
 modfile.write('param y_target{i in 1..' + str(outputSize) + '};\n')
 
 i = 0
@@ -135,7 +138,7 @@ for layer in model.layers:
 
   i = i + 1
 
-ouputLayer = len(model.layers) - 1
+outputLayer = len(model.layers) - 1
 modfile.write('subject to zclampPositive' + str(outputLayer) + '{i in 1..columns' + str(outputLayer) + '}:\n')
 modfile.write('  z' + str(outputLayer) + '[i] = if y_target[i] > 0 then y_target[i] else z' + str(outputLayer) + '[i];\n')
 modfile.write('subject to zclampNegative' + str(outputLayer) + '{i in 1..columns' + str(outputLayer) + '}:\n')

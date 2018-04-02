@@ -9,12 +9,13 @@ source ${HOME}/setup.bash
 module load py-keras
 module load py-tensorflow
 cd ${HOME}/SLAC_FEL_data/training
+LEARNING_RATE=0.00001
 
 for NUM_HIDDEN_LAYERS in 2 3 4 
 do
   for NUM_HIDDEN_UNITS_PER_LAYER in 1024 2048 4096
   do
-    python forward_keras.py ${NUM_HIDDEN_LAYERS} ${NUM_HIDDEN_UNITS_PER_LAYER}
+    python forward_keras.py ${NUM_HIDDEN_LAYERS} ${NUM_HIDDEN_UNITS_PER_LAYER} ${LEARNING_RATE}
   done
 done
 
