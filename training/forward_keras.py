@@ -26,7 +26,7 @@ numTrainingSamples = 100000
 numHiddenLayers = 2
 numHiddenUnitsPerLayer = 1024
 batch_size = 128
-epochs = 100
+epochs = 50
 
 if len(argv) == 3:
   numHiddenLayers = int(argv[1])
@@ -93,6 +93,9 @@ def print2D(file, array):
 
 modfile.write('# len(model.layers) = ' + str(len(model.layers)) + '\n')
 
+outputSize = model.layers[:-1].get_weights()[0][0]
+modfile.write('param y_target{i in 1..' + str(outputSize) + '};\n')
+
 i = 0
 for layer in model.layers:
   weights = layer.get_weights()
@@ -118,7 +121,25 @@ for layer in model.layers:
   modfile.write( 'param bias_' + str(i) + '{i in 1..bias_columns_' + str(i) + '};\n')
   datfile.write( 'param bias_' + str(i) + ' :=\n')
   print1D(datfile, weights[1])
+
+  modfile.write('var a' + str(i) + '{i in 1..columns' + str(i) + '};\n')
+
+  if i > 0:
+    modfile.write('var z' + str(i) + '{i in 1..columns' + str(i) + '};\n')
+    modfile.write('subject to rangemax' + str(i) + '{i in 1..columns' + str(i) + '}: z' + str(i) + '[i] <= 1;\n')
+    modfile.write('subject to rangemin' + str(i) + '{i in 1..columns' + str(i) + '}: z' + str(i) + '[i] >= -1;\n')
+    modfile.write('subject to zassign' + str(i) + '{i in 1..columns' + str(i) + '}:\n')
+    modfile.write('  z' + str(i) + '[i] = sum{j in 1..columns' + str(i - 1) + '} (weight_' + str(i) + '[j, i] * z' + str(i - 1) + '[j]) + bias_' + str(i) + '[i];\n')
+    modfile.write('subject to activation' + str(i) + '{i in 1..columns' + str(i) + '}:\n')
+    modfile.write('  a' + str(i) + '[i] = z' + str(i) + '[i] * (tanh(100.0*z' + str(i) + '[i]) + 1) * 0.5;\n')
+
   i = i + 1
+
+ouputLayer = len(model.layers) - 1
+modfile.write('subject to zclampPositive' + str(outputLayer) + '{i in 1..columns' + str(outputLayer) + '}:\n')
+modfile.write('  z' + str(outputLayer) + '[i] = if y_target[i] > 0 then y_target[i] else z' + str(outputLayer) + '[i];\n')
+modfile.write('subject to zclampNegative' + str(outputLayer) + '{i in 1..columns' + str(outputLayer) + '}:\n')
+modfile.write('  z' + str(outputLayer) + '[i] <= if y_target[i] > 0 then z' + str(outputLayer) + '[i] else 0;\n')
 
 modfile.close()
 datfile.close()

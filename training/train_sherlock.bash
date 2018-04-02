@@ -10,9 +10,9 @@ module load py-keras
 module load py-tensorflow
 cd ${HOME}/SLAC_FEL_data/training
 
-for NUM_HIDDEN_LAYERS in 1 2 3 4 5 6 7 8
+for NUM_HIDDEN_LAYERS in 2 3 4 
 do
-  for NUM_HIDDEN_UNITS_PER_LAYER in 128 256 512
+  for NUM_HIDDEN_UNITS_PER_LAYER in 1024 2048 4096
   do
     python forward_keras.py ${NUM_HIDDEN_LAYERS} ${NUM_HIDDEN_UNITS_PER_LAYER}
   done
