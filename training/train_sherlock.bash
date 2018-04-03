@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=trainFEL
-#SBATCH --time=08:00:00
+#SBATCH --time=30:00:00
 #SBATCH -p aaiken
 #SBATCH --gres gpu:1
 #SBATCH --nodes=1

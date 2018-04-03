@@ -64,14 +64,14 @@ for i in range(numInputLayers + numHiddenLayers):
     if direction == 'forward':
       model.add(Dense(numHiddenUnitsPerLayer, activation='relu', input_dim=len(FEL_INPUT.train_x[0])))
     else:
-      model.add(Dense(numHiddenUnitsPerLayer, activation='relu', input_dim=len(FEL_INPUT.train_y[0])))
+      model.add(Dense(numHiddenUnitsPerLayer, activation='relu', input_dim=len(FEL_OUTPUT.train_y[0])))
   else:
     model.add(Dense(numHiddenUnitsPerLayer, activation='relu'))
 
 if direction == 'forward':
   model.add(Dense(len(FEL_OUTPUT.train_y[0]), activation='relu'))
 else:
-  model.add(Dense(len(FEL_OUTPUT.train_x[0]), activation='relu'))
+  model.add(Dense(len(FEL_INPUT.train_x[0]), activation='relu'))
 
 model.compile(loss=mse, optimizer=SGD(lr=learningRate, decay=1.0e-6), metrics=['accuracy'])
 
@@ -90,13 +90,13 @@ if direction == 'forward':
           validation_data=(FEL_INPUT.test_x, FEL_OUTPUT.test_y))
   score = model.evaluate(FEL_INPUT.test_x, FEL_OUTPUT.test_y, verbose=0)
 else:
-  model.fit(FEL_INPUT.train_y, FEL_OUTPUT.train_x,
+  model.fit(FEL_OUTPUT.train_y, FEL_INPUT.train_x,
           batch_size=batch_size,
           epochs=epochs,
           callbacks=callbacks_list,
           verbose=1,
-          validation_data=(FEL_INPUT.test_y, FEL_OUTPUT.test_x))
-  score = model.evaluate(FEL_INPUT.test_y, FEL_OUTPUT.test_x, verbose=0)
+          validation_data=(FEL_OUTPUT.test_y, FEL_INPUT.test_x))
+  score = model.evaluate(FEL_OUTPUT.test_y, FEL_INPUT.test_x, verbose=0)
 
 
 
@@ -189,7 +189,7 @@ for layer in model.layers:
   pyfile.write('\nbias_' + str(i) + ' = [ ')
   for value in weights[1]:
     pyfile.write(str(value) + ', ')
-  prfile.write(']\n')
+  pyfile.write(']\n')
 
   modfile.write('# activations\n')
   modfile.write('var a' + str(i) + '{i in 1..columns_' + str(i) + '};\n\n')
