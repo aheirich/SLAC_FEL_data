@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=trainFEL
+#SBATCH --job-name=FELforward
 #SBATCH --time=30:00:00
 #SBATCH -p aaiken
 #SBATCH --gres gpu:1
