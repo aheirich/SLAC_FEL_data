@@ -76,7 +76,7 @@ else:
 model.compile(loss=mse, optimizer=SGD(lr=learningRate, decay=1.0e-6), metrics=['accuracy'])
 
 # checkpoint
-filepath = filenameRoot + "-weights-improvement-{epoch:02d}-{val_acc:.2f}.dat"
+filepath = filenameRoot + "-weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
 checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=True, mode='min')
 callbacks_list = [checkpoint]
 
