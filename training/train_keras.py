@@ -2,7 +2,7 @@
 #
 # train-keras.py
 #
-# numLayers numUnitsPerLayer learningRate epochs direction filenameRoot
+# numLayers numUnitsPerLayer learningRate epochs direction filenameRoot [checkpoint]
 #
 #   2 2048 0.00001 10000 forward modelname_2_2048_
 #
@@ -34,6 +34,7 @@ batch_size = 128
 epochs = 100
 learningRate = 0.00001
 direction = 'forward'
+checkpoint = None
 
 if len(argv) >= 3:
   numHiddenLayers = int(argv[1])
@@ -44,12 +45,15 @@ if len(argv) >= 5:
   epochs = int(argv[4])
 if len(argv) >= 6:
   direction = argv[5]
-
 filenameRoot = direction + "_" + str(numHiddenLayers) + "_" + str(numHiddenUnitsPerLayer)
 if len(argv) >= 7:
   filenameRoot = argv[6]
+if len(argv) >= 8:
+  checkpoint = argv[7]
 
 print('numHiddenLayers', numHiddenLayers, 'unitsPerLayer', numHiddenUnitsPerLayer, 'learningRate', learningRate, 'epochs', epochs, 'direction', direction)
+if checkpoint is not None:
+  print 'continue from checkpoint', checkpoint
 if direction == 'forward':
   print('learning forward mapping from controls to FEL pulse energy')
 else:
@@ -58,7 +62,7 @@ print('output to files', filenameRoot)
 
 model = Sequential()
 
-numInputLayers = 1
+numInputLayers = 1 # todo change this to zero
 for i in range(numInputLayers + numHiddenLayers):
   if i == 0:
     if direction == 'forward':
@@ -77,8 +81,10 @@ model.compile(loss=mse, optimizer=SGD(lr=learningRate, decay=1.0e-6), metrics=['
 
 # checkpoint
 filepath = filenameRoot + "-weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
-checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=True, mode='min')
-callbacks_list = [checkpoint]
+callbacks_list = [ ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=True, mode='min') ]
+
+if checkpoint is not None:
+  model.load_weights(checkpoint)
 
 
 if direction == 'forward':
