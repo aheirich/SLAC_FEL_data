@@ -188,7 +188,7 @@ def smoothed(series, file):
       result.append(sum[i])
     else:
       result.append(sum[i] / counter)
-:  return result
+  return result
 
 
 
