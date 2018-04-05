@@ -62,8 +62,7 @@ print('output to files', filenameRoot)
 
 model = Sequential()
 
-numInputLayers = 1 # todo change this to zero
-for i in range(numInputLayers + numHiddenLayers):
+for i in range(numHiddenLayers):
   if i == 0:
     if direction == 'forward':
       model.add(Dense(numHiddenUnitsPerLayer, activation='relu', input_dim=len(FEL_INPUT.train_x[0])))
@@ -184,7 +183,7 @@ for layer in model.layers:
     pyfile.write('[ ')
     for value in weight:
       pyfile.write(str(value) + ', ')
-    pyfile.write(']\n')
+    pyfile.write('],\n')
   pyfile.write(']\n')
 
   modfile.write( 'param bias_columns_' + str(i) + ';\n')

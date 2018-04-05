@@ -30,15 +30,33 @@ def write_array(file, array, name):
   file.write("])\n\n")
 
 
+def readStatisticsFile(file):
+  input_mins = []
+  input_maxs = []
+  output_mins = []
+  output_maxs = []
+  for line in file:
+    words = line.strip().split(' ')
+    if len(words) != 5: continue
+    if words[1] == 'min':
+      if words[0].startswith('input'):
+        input_mins.append(float(words[2]))
+        input_maxs.append(float(words[4]))
+      else:
+        output_mins.append(float(words[2]))
+        output_maxs.append(float(words[4]))
+  return min(input_mins[0], input_mins[1]), max(input_maxs[0], input_maxs[1]), min(output_mins[0], output_mins[1]), max(output_maxs[0], output_maxs[1])
 
-if len(sys.argv) == 5:
-  min_x = float(sys.argv[1])
-  max_x = float(sys.argv[2])
-  min_y = float(sys.argv[3])
-  max_y = float(sys.argv[4])
+
+
+if len(sys.argv) == 2:
+  file = open(sys.argv[1], 'r')
+  if file is not None:
+    min_x, max_x, min_y, max_y = readStatisticsFile(file)
 else:
-  print "provide xmin, xmax, ymin, ymax"
+  print 'please provide a statistics file (see reportDataStatistics.py)'
   sys.exit(1)
+
 
 fel_input = open("FEL_INPUT_SCALED.py", "w")
 fel_input.write("import numpy\n")
@@ -46,6 +64,7 @@ fel_output = open("FEL_OUTPUT_SCALED.py", "w")
 fel_output.write("import numpy\n")
 
 fel_input.write("fields = " + str(FEL_INPUT.fields) + "\n\n")
+fel_output.write("fields = " + str(FEL_INPUT.fields) + "\n\n")
 
 train_x = rescale(FEL_INPUT.train_x, min_x, max_x)
 write_array(fel_input, train_x, "train_x")

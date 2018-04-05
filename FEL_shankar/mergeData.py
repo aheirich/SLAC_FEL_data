@@ -120,6 +120,14 @@ def display(datetime, nextInputs, isInput, files):
 
 
 
+def isInteresting(name, datetime):
+  if name.startswith('data/GDET') and datetime >= "2017-11-04---18:59:50":
+    return True
+  return False
+
+
+
+
 def readAhead(file, i, nextInputs, lookAhead, previousDateTime):
   if lookAhead[i][0] != MAX_DATETIME:
     nextInputs[i] = lookAhead[i]
@@ -144,25 +152,30 @@ def readAhead(file, i, nextInputs, lookAhead, previousDateTime):
 
 
 
-
 def getNext(files, currentTime, nextInputs, lookAhead):
   earliestDateTime = MAX_DATETIME
   controlChanged = False
   
   for i in range(len(files)):
     lookaheadDateTime = lookAhead[i][0]
+    
     if lookaheadDateTime >= currentTime and lookaheadDateTime < earliestDateTime:
       earliestDateTime = lookaheadDateTime
   
   for i in range(len(files)):
     lookaheadDateTime = lookAhead[i][0]
+    
     if lookaheadDateTime == earliestDateTime:
       oldValue = nextInputs[i]
       nextInputs, lookAhead = readAhead(files[i], i, nextInputs, lookAhead, lookaheadDateTime)
       newValue = nextInputs[i]
+      
       valueChanged = oldValue[1] != newValue[1]
       if valueChanged and isControl(files[i].name):
         controlChanged = True
+
+    if lookAhead[i][0] < nextInputs[i][0]:
+      print 'ERROR: input is out of order in', file[i].name, 'near', lookAhead[i]
 
   return nextInputs, lookAhead, controlChanged
 
@@ -199,14 +212,21 @@ FEL_OUTPUT = open('FEL_OUTPUT.py', 'w')
 FEL_INPUT.write("import numpy\n")
 FEL_INPUT.write('fields = [\\\n')
 FEL_OUTPUT.write("import numpy\n")
+FEL_OUTPUT.write('fields = [\\\n')
+
 header = ''
 for file in files:
   words = file.name.split('/')
   header = header + '"' + words[1] + '", '
+
 FEL_INPUT.write(header + '\n')
 FEL_INPUT.write(']\n')
 FEL_INPUT.write('')
 FEL_INPUT.write('train_x = numpy.array([\\\n')
+
+FEL_OUTPUT.write(header + '\n')
+FEL_OUTPUT.write(']\n')
+FEL_OUTPUT.write('')
 FEL_OUTPUT.write('train_y = numpy.array([\\\n')
 
 nextInputs = readNext(files)
@@ -240,10 +260,12 @@ while True:
     if not first:
       FEL_INPUT.write('# ' + str(inputDisplay[0]) + '\n')
       FEL_INPUT.write(str(inputDisplay[1:]) + ', \\\n')
+      FEL_INPUT.flush()
       
       FEL_OUTPUT.write('# ' + str(outputDisplay[0]) + '\n')
       smoothedOutputDisplay = smoothed(outputSeries, FEL_OUTPUT)
       FEL_OUTPUT.write(str(smoothedOutputDisplay[1:]) + ', \\\n')
+      FEL_OUTPUT.flush()
 
     outputSeries = []
     first = False

@@ -1,8 +1,8 @@
 all:	FEL_INPUT_SCALED.py
 
-FEL_INPUT_SCALED.py: FEL_INPUT.py FEL_OUTPUT.py rescaleData.py
-	python rescaleData.py -112 112 -1 28
+FEL_INPUT_SCALED.py: FEL_INPUT.py FEL_OUTPUT.py rescaleData.py data_statistics.txt
+	python rescaleData.py data_statistics.txt
 
-ranges.txt: findDataRange.py
-	python findDataRange.py > ranges.txt
+data_statistics.txt: reportDataStatistics.py
+	python reportDataStatistics.py > data_statistics.txt
 
