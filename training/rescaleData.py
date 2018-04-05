@@ -21,13 +21,13 @@ def rescale(array, minx, maxx):
 
 
 def write_array(file, array, name):
-  file.write(name + " = [\n")
+  file.write(name + " = numpy.array([\n")
   for row in array:
     file.write("  [ ")
     for value in row:
       file.write(str(value) + ", ")
     file.write("], \\\n")
-  file.write("]\n\n")
+  file.write("])\n\n")
 
 
 
