@@ -40,7 +40,7 @@ def activations(x, weights, biases):
       aShape = a.shape
       z = numpy.matmul(a, weights[layer - 1]) + biases[layer - 1]
       a = numpy.maximum(z, 0.0)
-  return a[0]
+  return a
 
 
 
@@ -70,11 +70,8 @@ def infer(x, y, weights, biases):
 
 
 
-print 'w,b'
 weights, biases = loadModel()
-print 'tx,ty'
 train_x, train_y, test_x, test_y = loadData()
-print 'mes_train'
 mse_train = infer(train_x, train_y, weights, biases)
 print 'mse_train', mse_train
 mse_test = infer(test_x, test_y, weights, biases)
