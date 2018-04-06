@@ -51,7 +51,7 @@ while read duplicate ; do
 
   rm -f duplicate_outputs.txt
   while read duplicate_timestamp ; do
-    grep -A 1 "${duplicate_timestamp}" ${OUTPUT} | grep -v "^#" | sed -e "s/[][\\,]//g" >> duplicate_outputs.txt
+    grep -A 1 "${duplicate_timestamp}" ${OUTPUT} | grep -v "^#" | sed -e "s/[][\\,']//g" >> duplicate_outputs.txt
   done <duplicate_timestamps.txt
   cat duplicate_outputs.txt | sort | uniq > duplicate_outputs_uniq.txt
 
