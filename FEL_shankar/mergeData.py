@@ -61,10 +61,11 @@ def display(datetime, nextInputs, isInput, files):
   data = [ datetime ]
   for i in range(len(nextInputs)):
     input = nextInputs[i]
+    value = float(input[1])
     if isInput and isControl(files[i].name):
-      data.append(input[1])
+      data.append(value)
     elif not isInput and not isControl(files[i].name):
-      data.append(input[1])
+      data.append(value)
   return data
 
 
