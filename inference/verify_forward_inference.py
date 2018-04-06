@@ -8,10 +8,10 @@ import math
 import numpy
 
 import forward_2_2048
-import FEL_INPUT
-import FEL_OUTPUT
+import FEL_INPUT_SCALED as FEL_INPUT
+import FEL_OUTPUT_SCALED as FEL_OUTPUT
 
-numLayers = forward_2_2048.numHiddenLayers + 2
+numLayers = forward_2_2048.numHiddenLayers + 1
 
 
 
