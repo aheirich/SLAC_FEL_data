@@ -11,7 +11,6 @@ import sys
 MAX_DATETIME = "9999-99-99---99:99:99"
 
 
-
 def openInputFiles(argv):
   files = []
   for i in range(len(argv)):
@@ -46,8 +45,10 @@ def readNext(files):
       if len(words) > 4:
         datetime = words[0]
         value = words[1]
+        if value == 'NaN': continue
         if datetime is None: continue
         result.append([datetime, value])
+
         break
   return result
 
@@ -58,6 +59,7 @@ def isControl(name):
 
 
 def display(datetime, nextInputs, isInput, files):
+  
   data = [ datetime ]
   for i in range(len(nextInputs)):
     input = nextInputs[i]
@@ -93,6 +95,7 @@ def readAhead(file, i, nextInputs, lookAhead, previousDateTime):
     if len(words) > 4:
       datetime = words[0]
       value = words[1]
+      if value == 'NaN': continue
       if datetime is None: continue
       if datetime == previousDateTime: continue
       lookAhead[i] = [datetime, value]
@@ -133,10 +136,12 @@ def getNext(files, currentTime, nextInputs, lookAhead):
 
 
 def smoothed(series, file):
+  
   sum = []
   for i in series[0]: sum.append(0.0)
   counter = 0
   i = 0
+  
   for row in series:
     i = i + 1
     if i <= len(series) / 2: continue
@@ -146,12 +151,14 @@ def smoothed(series, file):
         sum[j] = row[j]
       else:
         sum[j] = sum[j] + float(row[j])
+
   result = []
   for i in range(len(sum)):
     if i == 0:
       result.append(sum[i])
     else:
       result.append(sum[i] / counter)
+
   return result
 
 
@@ -182,7 +189,6 @@ FEL_OUTPUT.write('train_y = numpy.array([\\\n')
 
 nextInputs = readNext(files)
 lookAhead = readNext(files)
-lastDisplay = ''
 controlChanged = True
 trainingStartDate = "2017-07-01"
 testStartDate = "2017-12-01"
@@ -190,16 +196,19 @@ inTest = False
 outputSeries = []
 printEveryDataPoint = False # debug feature
 first = True
+lastTime = ''
 
 while True:
   currentTime = latestDateTime(nextInputs)
   inputDisplay = display(currentTime, nextInputs, True, files)
   outputDisplay = display(currentTime, nextInputs, False, files)
   outputSeries.append(outputDisplay)
-  fullDisplay = inputDisplay + outputDisplay
-  if fullDisplay == lastDisplay: break
-  lastDisplay = fullDisplay
   nextInputs, lookAhead, controlChanged = getNext(files, currentTime, nextInputs, lookAhead)
+  
+  stillOpen = False
+  for file in files:
+    if not file.closed: stillOpen = True
+  if not stillOpen: break
   
   if (controlChanged and currentTime >= trainingStartDate) or printEveryDataPoint:
     if currentTime >= testStartDate:
