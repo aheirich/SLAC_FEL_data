@@ -89,7 +89,7 @@ if checkpoint is not None:
 epoch = 0
 while epoch < epochs:
   print 'Epoch', epoch
-  thisEpochs = max(epochs - epoch, checkpointInterval)
+  thisEpochs = min(epochs - epoch, checkpointInterval)
   if direction == 'forward':
     model.fit(FEL_INPUT.train_x, FEL_OUTPUT.train_y,
             batch_size=batch_size,
@@ -202,20 +202,26 @@ for layer in model.layers:
   pyfile.write(']\n')
 
   modfile.write('# activations\n')
+  if i == 0:
+    modfile.write('var x{i in 1..rows_0};\n')
   modfile.write('var a' + str(i) + '{i in 1..columns_' + str(i) + '};\n\n')
 
-  if i > 0:
-    modfile.write('# preactivations\n')
-    modfile.write('var z' + str(i) + '{i in 1..columns_' + str(i) + '};\n\n')
-    modfile.write('# range constraints\n')
-    modfile.write('subject to rangemax' + str(i) + '{i in 1..columns_' + str(i) + '}: z' + str(i) + '[i] <= 1;\n')
-    modfile.write('subject to rangemin' + str(i) + '{i in 1..columns_' + str(i) + '}: z' + str(i) + '[i] >= -1;\n')
-    modfile.write('\n# compute preactivations\n')
-    modfile.write('subject to preactivation' + str(i) + '{i in 1..columns_' + str(i) + '}:\n')
-    modfile.write('  z' + str(i) + '[i] = sum{j in 1..columns_' + str(i - 1) + '} (weight_' + str(i) + '[j, i] * z' + str(i - 1) + '[j]) + bias_' + str(i) + '[i];\n')
-    modfile.write('\n# compute activations\n')
-    modfile.write('subject to activation' + str(i) + '{i in 1..columns_' + str(i) + '}:\n')
-    modfile.write('  a' + str(i) + '[i] = z' + str(i) + '[i] * (tanh(100.0*z' + str(i) + '[i]) + 1) * 0.5;\n')
+  modfile.write('# preactivations\n')
+  modfile.write('var z' + str(i) + '{i in 1..columns_' + str(i) + '};\n\n')
+  modfile.write('# range constraints\n')
+  modfile.write('subject to rangemax' + str(i) + '{i in 1..columns_' + str(i) + '}: z' + str(i) + '[i] <= 1;\n')
+  modfile.write('subject to rangemin' + str(i) + '{i in 1..columns_' + str(i) + '}: z' + str(i) + '[i] >= -1;\n')
+  modfile.write('\n# compute preactivations\n')
+  modfile.write('subject to preactivation' + str(i) + '{i in 1..columns_' + str(i) + '}:\n')
+  if i == 0:
+    modfile.write('  z' + str(i) + '[i] = sum{j in 1..rows_0} (weight_' + str(i))
+    modfile.write('[j, i] * x[j]) + bias_' + str(i) + '[i];\n')
+  else:
+    modfile.write('  z' + str(i) + '[i] = sum{j in 1..columns_' + str(i - 1) + '} (weight_' + str(i))
+    modfile.write('[j, i] * a' + str(i - 1) + '[j]) + bias_' + str(i) + '[i];\n')
+  modfile.write('\n# compute activations\n')
+  modfile.write('subject to activation' + str(i) + '{i in 1..columns_' + str(i) + '}:\n')
+  modfile.write('  a' + str(i) + '[i] = z' + str(i) + '[i] * (tanh(100.0*z' + str(i) + '[i]) + 1) * 0.5;\n')
 
   i = i + 1
 
@@ -225,6 +231,10 @@ modfile.write('subject to zclampPositive' + str(outputLayer) + '{i in 1..columns
 modfile.write('  z' + str(outputLayer) + '[i] = if y_target[i] > 0 then y_target[i] else z' + str(outputLayer) + '[i];\n')
 modfile.write('subject to zclampNegative' + str(outputLayer) + '{i in 1..columns_' + str(outputLayer) + '}:\n')
 modfile.write('  z' + str(outputLayer) + '[i] <= if y_target[i] > 0 then z' + str(outputLayer) + '[i] else 0;\n')
+
+modfile.write('\n# objective function\n')
+modfile.write('minimize loss: sum{i in 1..' + str(outputSize) + '}(y_target[i] - a2[i])^2;\n')
+# todo add a regularizer here
 
 modfile.close()
 datfile.close()
