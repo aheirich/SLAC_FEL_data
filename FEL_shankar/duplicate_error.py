@@ -6,6 +6,7 @@ import math
 array = []
 for line in sys.stdin: 
   words = line.strip().split(' ')
+  print words
   array.append(words)
 
 sum = []

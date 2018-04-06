@@ -1,12 +1,21 @@
+SOURCEFILES := $(wildcard data/BEND*.txt) $(wildcard data/QUAD*.txt) $(wildcard data/GDET_FEE1_24*.txt)
+GDET=data/GDET_FEE1_241_ENRC.txt data/GDET_FEE1_242_ENRC.txt
+SRTFILES := $(SOURCEFILES:.txt=.srt) $(GDET:.txt=.srt)
+
+
 all: FEL_INPUT.py FEL_OUTPUT.py duplicates_forward.log duplicates_backward.log
 
 
-data/GDET_FEE1_241_ENRC.txt:	data/assemble.bash data/GDET_FEE1_241_ENRC.txtaa
-	(cd data; ./assemble.bash)
+%.txt:	%.txtaa
+	cat $@?* > $@
 
-FEL_INPUT.py:	mergeData.py
+%.srt:	%.txt rewriteDates.py 
+	cat $< | python rewriteDates.py | sort > $@
+
+FEL_INPUT.py:	mergeData.py $(SRTFILES)
 FEL_OUTPUT.py:	mergeData.py
-	python mergeData.py data/BEND*.txt data/QUAD*.txt data/GDET_FEE1_24*.txt
+	echo mergeData
+	python mergeData.py $(SRTFILES)
 
 duplicates_forward.log:	FEL_INPUT.py FEL_OUTPUT.py find_duplicates.bash
 	./find_duplicates.bash
@@ -29,3 +38,8 @@ duplicates_backward.log:	FEL_INPUT.py FEL_OUTPUT.py find_duplicates.bash
 
 clean:
 	rm -f FEL_OUTPUT.py FEL_INPUT.py
+	rm -f $(SRTFILES)
+	rm -f $(GDET)
+	rm -f duplicate_outputs.txt duplicate_outputs_uniq.txt duplicates_backward.log
+	rm -f duplicates_forward.log duplicates.log duplicates.txt duplicate_timestamps.txt
+	rm -f input.txt
