@@ -30,10 +30,17 @@ def findRange(array):
 
 def computeStatistics(array):
   sum = []
-  for i in range(len(array[0])): sum.append(0.0)
+  minx = []
+  maxx = []
+  for i in range(len(array[0])):
+    sum.append(0.0)
+    minx.append(999999)
+    maxx.append(-999999)
   for row in array:
     for i in range(len(row)):
       sum[i] = sum[i] + row[i]
+      minx[i] = min(minx[i], row[i])
+      maxx[i] = max(maxx[i], row[i])
   mean = []
   for i in range(len(array[0])): mean.append(sum[i] / len(array))
   sumSquares = []
@@ -44,34 +51,42 @@ def computeStatistics(array):
       sumSquares[i] = sumSquares[i] + diff * diff
   stddev = []
   for value in sumSquares: stddev.append(math.sqrt(sumSquares[i] / len(array)))
-  return mean, stddev
+  return mean, stddev, minx, maxx
 
 
 
 input_train_min, input_train_max = findRange(FEL_INPUT.train_x)
-input_train_mean, input_train_stddev = computeStatistics(FEL_INPUT.train_x)
+input_train_mean, input_train_stddev, input_train_minx, input_train_maxx = computeStatistics(FEL_INPUT.train_x)
 print ''
 print 'input_train', 'min', input_train_min, 'max', input_train_max
+print 'min', input_train_minx
+print 'max', input_train_maxx
 print ' mean', input_train_mean
 print ' standard deviation', input_train_stddev
 
 input_test_min, input_test_max = findRange(FEL_INPUT.test_x)
-input_test_mean, input_test_stddev = computeStatistics(FEL_INPUT.test_x)
+input_test_mean, input_test_stddev, input_test_minx, input_test_maxx = computeStatistics(FEL_INPUT.test_x)
 print ''
 print 'input_test', 'min', input_test_min, 'max', input_test_max
+print 'min', input_test_minx
+print 'max', input_test_maxx
 print ' mean', input_test_mean
 print ' standard deviation', input_test_stddev
 
 output_train_min, output_train_max = findRange(FEL_OUTPUT.train_y)
-output_train_mean, output_train_stddev = computeStatistics(FEL_OUTPUT.train_y)
+output_train_mean, output_train_stddev, output_train_minx, output_train_maxx = computeStatistics(FEL_OUTPUT.train_y)
 print ''
 print 'output_train', 'min', output_train_min, 'max', output_train_max
+print 'min', output_train_minx
+print 'max', output_train_maxx
 print ' mean', output_train_mean
 print ' standard deviation', output_train_stddev
 
 output_test_min, output_test_max = findRange(FEL_OUTPUT.test_y)
-output_test_mean, output_test_stddev = computeStatistics(FEL_OUTPUT.test_y)
+output_test_mean, output_test_stddev, output_test_minx, output_test_maxx = computeStatistics(FEL_OUTPUT.test_y)
 print ''
 print 'output_test', 'min', output_test_min, 'max', output_test_max
+print 'min', output_test_minx
+print 'max', output_test_maxx
 print ' mean', output_test_mean
 print ' standard deviation', output_test_stddev
