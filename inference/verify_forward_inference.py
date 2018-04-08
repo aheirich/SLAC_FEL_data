@@ -30,7 +30,7 @@ if not readFromStdin:
   import FEL_OUTPUT_SCALED as FEL_OUTPUT
 
 
-numLayers = theta.numHiddenLayers + 2
+numLayers = theta.numHiddenLayers + 1
 
 
 
@@ -55,16 +55,10 @@ def activations(x, weights, biases):
   for layer in range(numLayers):
     if layer == 0:
       z = numpy.matmul(x, weights[layer]) + biases[layer]
-      print 'z' + str(layer), z.shape, '=', x.shape, 'X', weights[layer].shape
-      print z
     else:
       z = numpy.matmul(a, weights[layer]) + biases[layer]
-      print 'z' + str(layer), z.shape, '=', a.shape, 'X', weights[layer].shape
-      print z
     a = numpy.maximum(z, 0.0)
-    print 'a' + str(layer) + ' shape', a.shape
-    print a
-  return a[0]
+  return a
 
 
 
@@ -83,10 +77,6 @@ def verify(x, y, weights, biases):
   sse_total = 0.0
   for i in range(len(x)):
     y_computed = activations(x[i], weights, biases)
-    
-    print 'x[i]', x[i]
-    print 'y_computed', y_computed
-    
     mse_i = mse(y_computed, y[i])
     sse_total = sse_total + mse_i * len(y[i])
     print '=== mse', mse_i
