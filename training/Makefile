@@ -15,7 +15,7 @@ regularizer.py:	scaled_statistics.txt
 	grep "^max" scaled_statistics.txt | head -1 | sed -e "s/max/input_max = /" >> regularizer.py
 
 objective.mod:  regularizer.py
-	python makeAmplRegularizer.py 2
+	python makeObjectiveWithRegularizer.py 2
 	@echo ASSUMING 2 HIDDEN LAYERS, MAKE AMPL REGULARIZER MANUALLY FOR 3 OR MORE LAYERS
 
 clean:

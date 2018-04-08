@@ -204,6 +204,9 @@ for layer in model.layers:
   modfile.write('# activations\n')
   if i == 0:
     modfile.write('var x{i in 1..rows_0};\n')
+    modfile.write('subject to rangemaxx{i in 1..rows_0}: x[i] <= 1;\n')
+    modfile.write('subject to rangeminx{i in 1..rows_0}: x[i] >= 0;\n')
+
   modfile.write('var a' + str(i) + '{i in 1..columns_' + str(i) + '};\n\n')
 
   modfile.write('# preactivations\n')
@@ -231,10 +234,6 @@ modfile.write('subject to zclampPositive' + str(outputLayer) + '{i in 1..columns
 modfile.write('  z' + str(outputLayer) + '[i] = if y_target[i] > 0 then y_target[i] else z' + str(outputLayer) + '[i];\n')
 modfile.write('subject to zclampNegative' + str(outputLayer) + '{i in 1..columns_' + str(outputLayer) + '}:\n')
 modfile.write('  z' + str(outputLayer) + '[i] <= if y_target[i] > 0 then z' + str(outputLayer) + '[i] else 0;\n')
-
-modfile.write('\n# objective function\n')
-modfile.write('minimize loss: sum{i in 1..' + str(outputSize) + '}(y_target[i] - a2[i])^2;\n')
-# todo add a regularizer here
 
 modfile.close()
 datfile.close()

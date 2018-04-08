@@ -6,13 +6,17 @@
 import sys
 import random
 
-if len(sys.argv) == 3:
+if len(sys.argv) >= 3:
   numHiddenLayers = int(sys.argv[1])
   numHiddenUnitsPerLayer = int(sys.argv[2])
 else:
-  print 'please provide numHiddenLayers and numHiddenUnitsPerLayer'
+  print 'please provide numHiddenLayers and numHiddenUnitsPerLayer, optional solver'
   print 'eg 2 2048'
   sys.exit(1)
+
+solver = "knitro"
+if len(sys.argv) == 4:
+  solver = sys.argv[3]
 
 
 modelname = "forward_" + str(numHiddenLayers) + "_" + str(numHiddenUnitsPerLayer)
@@ -30,7 +34,7 @@ randomFileDir = "randomInit/"
 
 def createRandomInitFile(trial):
   random.seed(trial)
-  filename = randomFileDir + 'randomInit' + str(trial) + '.dat'
+  filename = randomFileDir + 'randomInit_' + solver + "_" + str(trial) + '.dat'
   file = open(filename, "w")
   inputWidth = 20
   file.write("# random init " + str(numHiddenLayers) + " " + str(numHiddenUnitsPerLayer) + " trial " + str(trial) + '\n')
@@ -56,11 +60,11 @@ def createRandomInitFile(trial):
   file.close()
   return filename
 
-bashScript = open(modelname + '.bash', 'w')
+bashScript = open(modelname + "_" + solver + '.bash', 'w')
 
 numTrials = 100
 for trial in range(numTrials):
-  filename = randomFileDir + modelname + "_" + str(trial) + ".run"
+  filename = randomFileDir + modelname + "_" + solver + "_" + str(trial) + ".run"
   amplScript = open(filename, 'w')
   amplScript.write('# ::: Trial ' + str(trial) + ' :::\n')
   amplScript.write('model ' + modelname + '.mod;\n')
@@ -70,8 +74,8 @@ for trial in range(numTrials):
   amplScript.write('data y_target.dat;\n')
   randomInitFilename = createRandomInitFile(trial)
   amplScript.write('data ' + randomInitFilename + ';\n')
-  amplScript.write('option solver "/home/aheirich/bin/ampl.linux64/minos";\n')
-  amplScript.write('option minos_options "meminc=535 optimality_tolerance=1.0e-3 feasibility_tolerance=1.0e-3";\n')
+  amplScript.write("option solver \"/home/aheirich/bin/ampl.linux64/" + solver + "\";\n")
+  #amplScript.write('option minos_options "meminc=535 optimality_tolerance=1.0e-3 feasibility_tolerance=1.0e-3";\n')
   amplScript.write('solve;\n')
   amplScript.write('display x;\n')
   amplScript.write('display a' + str(numHiddenLayers) + ';\n')

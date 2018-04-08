@@ -39,6 +39,7 @@ datfile.write(";\n\n")
 modfile.write("# objective function with regularizer\n")
 modfile.write("minimize loss: sum{i in 1..columns_" + str(outputLayer) + "}(y_target[i] - a" + str(outputLayer) + "[i])^2")
 regularizerExpression = "((x[i] - regularizer_midpoint[i]) / regularizer_halflength[i])^2"
+regularizerExpression = "min(" + regularizerExpression + ", 2 * rows_0)"
 modfile.write(" + sum{i in 1..rows_0}" + regularizerExpression + ";\n")
 
 
