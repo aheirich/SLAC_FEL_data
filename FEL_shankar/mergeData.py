@@ -236,7 +236,7 @@ while True:
       sum = 0.0
       for value in inputDisplay[1:]: sum = sum + value
       FEL_FUNCTION.write('# ' + str(outputDisplay[0]) + '\n')
-      FEL_FUNCTION.write(str(sum) + ",\n")
+      FEL_FUNCTION.write('[ ' + str(sum) + " ],\n")
 
     outputSeries = []
     first = False

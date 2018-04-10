@@ -20,5 +20,5 @@ objective.mod:  regularizer.py
 
 clean:
 	rm -f data_statistics.txt scaled_statistics.txt
-	rm -f FEL_INPUT_SCALED.py FEL_OUTPUT_SCALED.py
+	rm -f FEL_INPUT_SCALED.py FEL_OUTPUT_SCALED.py FEL_FUNCTION_SCALED.py
 	rm -f objectve.mod objective.dat regularizer.py
