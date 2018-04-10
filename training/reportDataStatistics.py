@@ -50,7 +50,7 @@ def computeStatistics(array):
       diff = row[i] - mean[i]
       sumSquares[i] = sumSquares[i] + diff * diff
   stddev = []
-  for value in sumSquares: stddev.append(math.sqrt(sumSquares[i] / len(array)))
+  for value in sumSquares: stddev.append(math.sqrt(value / len(array)))
   return mean, stddev, minx, maxx
 
 
