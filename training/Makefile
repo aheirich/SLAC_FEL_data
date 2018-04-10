@@ -3,10 +3,10 @@ all:	FEL_INPUT_SCALED.py data_statistics.txt scaled_statistics.txt regularizer.p
 FEL_INPUT_SCALED.py: FEL_INPUT.py FEL_OUTPUT.py rescaleData.py data_statistics.txt
 	python rescaleData.py data_statistics.txt
 
-data_statistics.txt: reportDataStatistics.py
+data_statistics.txt: reportDataStatistics.py FEL_INPUT.py FEL_OUTPUT.py FEL_FUNCTION.py
 	python reportDataStatistics.py > data_statistics.txt
 
-scaled_statistics.txt: reportDataStatistics.py
+scaled_statistics.txt: reportDataStatistics.py FEL_INPUT.py FEL_OUTPUT.py FEL_FUNCTION.py
 	python reportDataStatistics.py scaled > scaled_statistics.txt
 
 regularizer.py:	scaled_statistics.txt
