@@ -98,6 +98,7 @@ def readAhead(file, i, nextInputs, lookAhead, previousDateTime):
       if value == 'NaN': continue
       if datetime is None: continue
       if datetime == previousDateTime: continue
+      if not isControl(file.name) and (value < 0.1 or value > 7.0): continue # invalid pulse energy values
       lookAhead[i] = [datetime, value]
       break
   return nextInputs, lookAhead
@@ -167,10 +168,12 @@ def smoothed(series, file):
 files = openInputFiles(sys.argv[1:])
 FEL_INPUT = open('FEL_INPUT.py', 'w')
 FEL_OUTPUT = open('FEL_OUTPUT.py', 'w')
+FEL_FUNCTION = open('FEL_FUNCTION.py', 'w')
 FEL_INPUT.write("import numpy\n")
 FEL_INPUT.write('fields = [\\\n')
 FEL_OUTPUT.write("import numpy\n")
 FEL_OUTPUT.write('fields = [\\\n')
+FEL_FUNCTION.write("import numpy\n")
 
 header = ''
 for file in files:
@@ -186,6 +189,8 @@ FEL_OUTPUT.write(header + '\n')
 FEL_OUTPUT.write(']\n')
 FEL_OUTPUT.write('')
 FEL_OUTPUT.write('train_y = numpy.array([\\\n')
+
+FEL_FUNCTION.write('train_y = numpy.array([\\\n')
 
 nextInputs = readNext(files)
 lookAhead = readNext(files)
@@ -216,6 +221,7 @@ while True:
         inTest = True
         FEL_INPUT.write('])\n\ntest_x = numpy.array([\\\n')
         FEL_OUTPUT.write('])\n\ntest_y = numpy.array([\\\n')
+        FEL_FUNCTION.write('])\n\ntest_y = numpy.array([\\\n')
   
     if not first:
       FEL_INPUT.write('# ' + str(inputDisplay[0]) + '\n')
@@ -227,10 +233,15 @@ while True:
       FEL_OUTPUT.write(str(smoothedOutputDisplay[1:]) + ', \\\n')
       FEL_OUTPUT.flush()
 
+      sum = 0.0
+      for value in inputDisplay[1:]: sum = sum + value
+      FEL_FUNCTION.write('# ' + str(outputDisplay[0]) + '\n')
+      FEL_FUNCTION.write(str(sum) + ",\n")
+
     outputSeries = []
     first = False
 
-for file in [FEL_INPUT, FEL_OUTPUT]:
+for file in [FEL_INPUT, FEL_OUTPUT, FEL_FUNCTION]:
   file.write('])\n')
   file.write('')
   file.close()
