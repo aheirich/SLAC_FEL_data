@@ -2,9 +2,9 @@
 #
 # train-keras.py
 #
-# numLayers numUnitsPerLayer learningRate epochs direction filenameRoot [checkpoint]
+# numLayers numUnitsPerLayer learningRate epochs optimizer direction filenameRoot [checkpoint]
 #
-#   2 2048 0.00001 10000 forward modelname_2_2048_
+#   2 2048 0.00001 10000 SGD forward modelname_2_2048_
 #
 
 from sys import argv
@@ -13,12 +13,12 @@ from keras.models import Sequential
 from keras.layers import Conv1D
 from keras.layers import Dense
 from keras.losses import mse
-from keras.optimizers import SGD
+from keras import optimizers
 from keras.callbacks import ModelCheckpoint
 import FEL_INPUT_SCALED as FEL_INPUT
 import FEL_OUTPUT_SCALED as FEL_OUTPUT
 
-repeatableResult = True
+repeatableResult = False
 usingTensorflow = True
 
 if repeatableResult:
@@ -32,6 +32,7 @@ numHiddenUnitsPerLayer = 1024
 batch_size = 128
 epochs = 10000
 learningRate = 0.1
+optimizer = "SGD"
 direction = 'forward'
 checkpoint = None
 checkpointInterval = 1000
@@ -44,12 +45,14 @@ if len(argv) >= 4:
 if len(argv) >= 5:
   epochs = int(argv[4])
 if len(argv) >= 6:
-  direction = argv[5]
-filenameRoot = direction + "_" + str(numHiddenLayers) + "_" + str(numHiddenUnitsPerLayer)
+  optimizer = argv[5]
 if len(argv) >= 7:
-  filenameRoot = argv[6]
+  direction = argv[6]
+filenameRoot = direction + "_" + str(numHiddenLayers) + "_" + str(numHiddenUnitsPerLayer)
 if len(argv) >= 8:
-  checkpoint = argv[7]
+  filenameRoot = argv[7]
+if len(argv) >= 9:
+  checkpoint = argv[8]
 
 print('numHiddenLayers', numHiddenLayers, 'unitsPerLayer', numHiddenUnitsPerLayer, 'learningRate', learningRate, 'epochs', epochs, 'direction', direction)
 if checkpoint is not None:
@@ -76,7 +79,8 @@ if direction == 'forward':
 else:
   model.add(Dense(len(FEL_INPUT.train_x[0]), activation='relu'))
 
-model.compile(loss=mse, optimizer=SGD(lr=learningRate, decay=1.0e-6), metrics=['accuracy'])
+eval("model.compile(loss=mse, optimizer=optimizers." + optimizer + "(lr=learningRate), metrics=['accuracy'])")
+
 
 # checkpoint
 filepath = filenameRoot + "-weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
