@@ -71,10 +71,6 @@ def pullData(pv, start, end):
 
 
 fields = [
-          'GDET:FEE1:241:ENRC',
-          'GDET:FEE1:242:ENRC',
-          'GDET:FEE1:361:ENRC',
-          'GDET:FEE1:362:ENRC',
           'BEND:DMP1:400:BDES',
           'QUAD:LTU1:440:BCTRL',
           'QUAD:LTU1:460:BCTRL',

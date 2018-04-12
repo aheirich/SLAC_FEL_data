@@ -1,4 +1,4 @@
-SOURCEFILES := $(wildcard data/BEND*.txt) $(wildcard data/QUAD*.txt) $(wildcard data/GDET_FEE1_24*.txt)
+SOURCEFILES := $(wildcard data/BEND*.txt) $(wildcard data/QUAD:*.txt)
 GDET=data/GDET_FEE1_241_ENRC.txt data/GDET_FEE1_242_ENRC.txt
 SRTFILES := $(SOURCEFILES:.txt=.srt) $(GDET:.txt=.srt)
 
