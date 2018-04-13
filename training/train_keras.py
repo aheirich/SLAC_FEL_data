@@ -4,7 +4,7 @@
 #
 # numLayers numUnitsPerLayer learningRate epochs optimizer direction filenameRoot [checkpoint]
 #
-#   2 2048 0.00001 10000 SGD forward modelname_2_2048_
+#   2 2048 0.00001 10000 SGD forward modelname_2_2048_ $SCRATCH/checkpoint/forward_2_2048
 #
 
 from sys import argv

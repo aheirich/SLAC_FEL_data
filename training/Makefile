@@ -3,10 +3,10 @@ all:	FEL_INPUT_SCALED.py data_statistics.txt scaled_statistics.txt regularizer.p
 FEL_INPUT_SCALED.py: FEL_INPUT.py FEL_OUTPUT.py rescaleData.py data_statistics.txt
 	python rescaleData.py data_statistics.txt
 
-data_statistics.txt: reportDataStatistics.py FEL_INPUT.py FEL_OUTPUT.py FEL_FUNCTION.py
+data_statistics.txt: reportDataStatistics.py FEL_INPUT.py FEL_OUTPUT.py 
 	python reportDataStatistics.py > data_statistics.txt
 
-scaled_statistics.txt: reportDataStatistics.py FEL_INPUT.py FEL_OUTPUT.py FEL_FUNCTION.py
+scaled_statistics.txt: reportDataStatistics.py FEL_INPUT.py FEL_OUTPUT.py 
 	python reportDataStatistics.py scaled > scaled_statistics.txt
 
 regularizer.py:	scaled_statistics.txt
@@ -20,5 +20,5 @@ objective.mod:  regularizer.py
 
 clean:
 	rm -f data_statistics.txt scaled_statistics.txt
-	rm -f FEL_INPUT_SCALED.py FEL_OUTPUT_SCALED.py FEL_FUNCTION_SCALED.py
+	rm -f FEL_INPUT_SCALED.py FEL_OUTPUT_SCALED.py 
 	rm -f objectve.mod objective.dat regularizer.py

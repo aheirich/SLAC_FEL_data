@@ -6,7 +6,6 @@
 import sys
 import FEL_INPUT
 import FEL_OUTPUT
-import FEL_FUNCTION
 
 
 def rescale(array, minx, maxx):
@@ -15,7 +14,7 @@ def rescale(array, minx, maxx):
     for i in range(len(row)):
       value = row[i]
       scaledValue = (value - minx) / (maxx - minx)
-      row[i] = scaledValue
+      row[i] = 1 + scaledValue
     array[j] = row
   return array
 
@@ -72,8 +71,6 @@ fel_input = open("FEL_INPUT_SCALED.py", "w")
 fel_input.write("import numpy\n")
 fel_output = open("FEL_OUTPUT_SCALED.py", "w")
 fel_output.write("import numpy\n")
-fel_function = open("FEL_FUNCTION_SCALED.py", "w")
-fel_function.write("import numpy\n")
 
 fel_input.write("fields = " + str(FEL_INPUT.fields) + "\n\n")
 fel_output.write("fields = " + str(FEL_INPUT.fields) + "\n\n")
@@ -87,16 +84,7 @@ write_array(fel_input, test_x, "test_x")
 test_y = rescale(FEL_OUTPUT.test_y, min_y, max_y)
 write_array(fel_output, test_y, "test_y")
 
-ftrain_min_y, ftrain_max_y = findRange(FEL_FUNCTION.train_y)
-ftest_min_y, ftest_max_y = findRange(FEL_FUNCTION.test_y)
-fMinY = min(ftrain_min_y, ftest_min_y)
-fMaxY = max(ftrain_max_y, ftest_max_y)
-function_train_y = rescale(FEL_FUNCTION.train_y, fMinY, fMaxY)
-write_array(fel_function, function_train_y, "train_y")
-function_test_y = rescale(FEL_FUNCTION.test_y, fMinY, fMaxY)
-write_array(fel_function, function_test_y, "test_y")
 
 fel_input.close()
 fel_output.close()
-fel_function.close()
 
