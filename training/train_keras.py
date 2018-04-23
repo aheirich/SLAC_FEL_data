@@ -75,9 +75,9 @@ for i in range(numHiddenLayers):
     model.add(Dense(numHiddenUnitsPerLayer, activation='relu'))
 
 if direction == 'forward':
-  model.add(Dense(len(FEL_OUTPUT.train_y[0]), activation='relu'))
+  model.add(Dense(len(FEL_OUTPUT.train_y[0]), activation='linear'))
 else:
-  model.add(Dense(len(FEL_INPUT.train_x[0]), activation='relu'))
+  model.add(Dense(len(FEL_INPUT.train_x[0]), activation='linear'))
 
 eval("model.compile(loss=mse, optimizer=optimizers." + optimizer + "(lr=learningRate), metrics=['accuracy'])")
 
