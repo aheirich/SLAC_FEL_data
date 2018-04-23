@@ -218,7 +218,6 @@ while True:
         inTest = True
         FEL_INPUT.write('])\n\ntest_x = numpy.array([\\\n')
         FEL_OUTPUT.write('])\n\ntest_y = numpy.array([\\\n')
-
     if not first:
       FEL_INPUT.write('# ' + str(inputDisplay[0]) + '\n')
       FEL_INPUT.write(str(inputDisplay[1:]) + ', \\\n')
