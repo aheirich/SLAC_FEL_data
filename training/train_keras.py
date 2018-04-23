@@ -93,11 +93,10 @@ if checkpoint is not None:
 epoch = 0
 while epoch < epochs:
   print 'Epoch', epoch
-  thisEpochs = min(epochs - epoch, checkpointInterval)
   if direction == 'forward':
     model.fit(FEL_INPUT.train_x, FEL_OUTPUT.train_y,
             batch_size=batch_size,
-            epochs=thisEpochs,
+            epochs=epochs,
             callbacks=callbacks_list,
             verbose=1,
             validation_data=(FEL_INPUT.test_x, FEL_OUTPUT.test_y))
@@ -105,7 +104,7 @@ while epoch < epochs:
   else:
     model.fit(FEL_OUTPUT.train_y, FEL_INPUT.train_x,
             batch_size=batch_size,
-            epochs=thisEpochs,
+            epochs=epochs,
             callbacks=callbacks_list,
             verbose=1,
             validation_data=(FEL_OUTPUT.test_y, FEL_INPUT.test_x))
