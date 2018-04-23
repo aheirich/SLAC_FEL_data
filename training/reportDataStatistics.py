@@ -58,35 +58,31 @@ def computeStatistics(array):
 input_train_min, input_train_max = findRange(FEL_INPUT.train_x)
 input_train_mean, input_train_stddev, input_train_minx, input_train_maxx = computeStatistics(FEL_INPUT.train_x)
 print ''
-print 'input_train', 'min', input_train_min, 'max', input_train_max
-print 'min', input_train_minx
-print 'max', input_train_maxx
-print ' mean', input_train_mean
-print ' standard deviation', input_train_stddev
+print 'input_train_min =', input_train_minx
+print 'input_train_max =', input_train_maxx
+print 'input_train_mean =', input_train_mean
+print 'input_train_stddev =', input_train_stddev
 
 input_test_min, input_test_max = findRange(FEL_INPUT.test_x)
 input_test_mean, input_test_stddev, input_test_minx, input_test_maxx = computeStatistics(FEL_INPUT.test_x)
 print ''
-print 'input_test', 'min', input_test_min, 'max', input_test_max
-print 'min', input_test_minx
-print 'max', input_test_maxx
-print ' mean', input_test_mean
-print ' standard deviation', input_test_stddev
+print 'input_test_min =', input_test_minx
+print 'input_test_max =', input_test_maxx
+print 'input_test_mean =', input_test_mean
+print 'input_test_stddec =', input_test_stddev
 
 output_train_min, output_train_max = findRange(FEL_OUTPUT.train_y)
 output_train_mean, output_train_stddev, output_train_minx, output_train_maxx = computeStatistics(FEL_OUTPUT.train_y)
 print ''
-print 'output_train', 'min', output_train_min, 'max', output_train_max
-print 'min', output_train_minx
-print 'max', output_train_maxx
-print ' mean', output_train_mean
-print ' standard deviation', output_train_stddev
+print 'output_train_min =', output_train_minx
+print 'output_train_max =', output_train_maxx
+print 'output_train_mean =', output_train_mean
+print 'output_train_stddev =', output_train_stddev
 
 output_test_min, output_test_max = findRange(FEL_OUTPUT.test_y)
 output_test_mean, output_test_stddev, output_test_minx, output_test_maxx = computeStatistics(FEL_OUTPUT.test_y)
 print ''
-print 'output_test', 'min', output_test_min, 'max', output_test_max
-print 'min', output_test_minx
-print 'max', output_test_maxx
-print ' mean', output_test_mean
-print ' standard deviation', output_test_stddev
+print 'output_test_min =', output_test_minx
+print 'output_test_max =', output_test_maxx
+print 'output_test_mean =', output_test_mean
+print 'output_test_stddec =', output_test_stddev

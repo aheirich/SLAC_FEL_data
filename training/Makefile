@@ -1,24 +1,15 @@
-all:	FEL_INPUT_SCALED.py data_statistics.txt scaled_statistics.txt regularizer.py objective.mod
+all:	FEL_INPUT_SCALED.py data_statistics.py scaled_statistics.py 
 
-FEL_INPUT_SCALED.py: FEL_INPUT.py FEL_OUTPUT.py rescaleData.py data_statistics.txt
-	python rescaleData.py data_statistics.txt
+FEL_INPUT_SCALED.py: FEL_INPUT.py FEL_OUTPUT.py rescaleData.py data_statistics.py
+	python rescaleData.py data_statistics.py
 
-data_statistics.txt: reportDataStatistics.py FEL_INPUT.py FEL_OUTPUT.py FEL_FUNCTION.py
-	python reportDataStatistics.py > data_statistics.txt
+data_statistics.py: reportDataStatistics.py FEL_INPUT.py FEL_OUTPUT.py 
+	python reportDataStatistics.py > data_statistics.py
 
-scaled_statistics.txt: reportDataStatistics.py FEL_INPUT.py FEL_OUTPUT.py FEL_FUNCTION.py
-	python reportDataStatistics.py scaled > scaled_statistics.txt
+scaled_statistics.py: reportDataStatistics.py FEL_INPUT.py FEL_OUTPUT.py 
+	python reportDataStatistics.py scaled > scaled_statistics.py
 
-regularizer.py:	scaled_statistics.txt
-	rm -f regularizer.py
-	grep "^min" scaled_statistics.txt | head -1 | sed -e "s/min/input_min = /" >> regularizer.py
-	grep "^max" scaled_statistics.txt | head -1 | sed -e "s/max/input_max = /" >> regularizer.py
-
-objective.mod:  regularizer.py
-	python makeObjectiveWithRegularizer.py 2
-	@echo ASSUMING 2 HIDDEN LAYERS, MAKE AMPL REGULARIZER MANUALLY FOR 3 OR MORE LAYERS
 
 clean:
-	rm -f data_statistics.txt scaled_statistics.txt
-	rm -f FEL_INPUT_SCALED.py FEL_OUTPUT_SCALED.py FEL_FUNCTION_SCALED.py
-	rm -f objectve.mod objective.dat regularizer.py
+	rm -f data_statistics.py scaled_statistics.py
+	rm -f FEL_INPUT_SCALED.py FEL_OUTPUT_SCALED.py 
