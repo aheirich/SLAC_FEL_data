@@ -2,9 +2,9 @@
 #
 # train-keras.py
 #
-# numLayers numUnitsPerLayer learningRate epochs optimizer direction filenameRoot [checkpoint]
+# numLayers numUnitsPerLayer learningRate epochs initialEpoch optimizer direction filenameRoot [checkpoint]
 #
-#   2 2048 0.00001 10000 SGD forward modelname_2_2048_ $SCRATCH/checkpoint/forward_2_2048
+#   2 2048 0.00001 10000 0 SGD forward modelname_2_2048_ $SCRATCH/checkpoint/forward_2_2048
 #
 
 from sys import argv
@@ -30,7 +30,8 @@ if repeatableResult:
 numHiddenLayers = 2
 numHiddenUnitsPerLayer = 1024
 batch_size = 128
-epochs = 10000
+epochs = 1000
+initialEpoch = 0
 learningRate = 0.1
 optimizer = "SGD"
 direction = 'forward'
@@ -45,16 +46,18 @@ if len(argv) >= 4:
 if len(argv) >= 5:
   epochs = int(argv[4])
 if len(argv) >= 6:
-  optimizer = argv[5]
+  initialEpoch = int(argv[5])
 if len(argv) >= 7:
-  direction = argv[6]
-filenameRoot = direction + "_" + str(numHiddenLayers) + "_" + str(numHiddenUnitsPerLayer)
+  optimizer = argv[6]
 if len(argv) >= 8:
-  filenameRoot = argv[7]
+  direction = argv[7]
+filenameRoot = direction + "_" + str(numHiddenLayers) + "_" + str(numHiddenUnitsPerLayer)
 if len(argv) >= 9:
-  checkpoint = argv[8]
+  filenameRoot = argv[8]
+if len(argv) >= 10:
+  checkpoint = argv[9]
 
-print('numHiddenLayers', numHiddenLayers, 'unitsPerLayer', numHiddenUnitsPerLayer, 'learningRate', learningRate, 'epochs', epochs, 'direction', direction)
+print('numHiddenLayers', numHiddenLayers, 'unitsPerLayer', numHiddenUnitsPerLayer, 'learningRate', learningRate, 'epochs', epochs, 'initialEpoch', initialEpoch, 'direction', direction)
 if checkpoint is not None:
   print 'continue from checkpoint', checkpoint
 if direction == 'forward':
@@ -79,7 +82,7 @@ if direction == 'forward':
 else:
   model.add(Dense(len(FEL_INPUT.train_x[0]), activation='linear'))
 
-eval("model.compile(loss=mse, optimizer=optimizers." + optimizer + "(lr=learningRate), metrics=['accuracy'])")
+model.compile(loss=mse, optimizer=eval("optimizers." + optimizer),  lr=learningRate, metrics=['accuracy'])
 
 
 # checkpoint
@@ -90,154 +93,24 @@ if checkpoint is not None:
   model.load_weights(checkpoint)
 
 
-epoch = 0
-while epoch < epochs:
-  print 'Epoch', epoch
-  if direction == 'forward':
-    model.fit(FEL_INPUT.train_x, FEL_OUTPUT.train_y,
-            batch_size=batch_size,
-            epochs=epochs,
-            callbacks=callbacks_list,
-            verbose=1,
-            validation_data=(FEL_INPUT.test_x, FEL_OUTPUT.test_y))
-    score = model.evaluate(FEL_INPUT.test_x, FEL_OUTPUT.test_y, verbose=0)
-  else:
-    model.fit(FEL_OUTPUT.train_y, FEL_INPUT.train_x,
-            batch_size=batch_size,
-            epochs=epochs,
-            callbacks=callbacks_list,
-            verbose=1,
-            validation_data=(FEL_OUTPUT.test_y, FEL_INPUT.test_x))
-    score = model.evaluate(FEL_OUTPUT.test_y, FEL_INPUT.test_x, verbose=0)
-  epoch = epoch + checkpointInterval
+if direction == 'forward':
+  model.fit(FEL_INPUT.train_x, FEL_OUTPUT.train_y,
+          batch_size=batch_size,
+          epochs=epochs,
+          initial_epoch=initialEpoch,
+          callbacks=callbacks_list,
+          verbose=1,
+          validation_data=(FEL_INPUT.test_x, FEL_OUTPUT.test_y))
+  score = model.evaluate(FEL_INPUT.test_x, FEL_OUTPUT.test_y, verbose=0)
+else:
+  model.fit(FEL_OUTPUT.train_y, FEL_INPUT.train_x,
+          batch_size=batch_size,
+          epochs=epochs,
+          initial_epoch=initialEpoch,
+          callbacks=callbacks_list,
+          verbose=1,
+          validation_data=(FEL_OUTPUT.test_y, FEL_INPUT.test_x))
+  score = model.evaluate(FEL_OUTPUT.test_y, FEL_INPUT.test_x, verbose=0)
+print 'score', score
 
 
-
-def print1D(file, array):
-  i = 1
-  for value in array: 
-    file.write( str(i) + ' ' + str(value) + '\n')
-    i = i + 1
-  file.write( ';\n\n')
-
-def print2D(file, array):
-  i = 1
-  for row in array:
-    file.write( str(i) + ' ')
-    for value in row: file.write( str(value) + ' ')
-    file.write( '\n')
-    i = i + 1
-  file.write( ';\n\n')
-
-
-
-
-
-datfileName = filenameRoot + ".dat"
-datfile = open(datfileName, "w")
-modfileName = filenameRoot + '.mod'
-modfile = open(modfileName, "w")
-pyfileName = filenameRoot + '.py'
-pyfile = open(pyfileName, "w")
-
-datfile.write( '# score' + str(score) + '\n')
-datfile.write("# numHiddenLayers " + str(numHiddenLayers) + " numHiddenUnitsPerLayer " + str(numHiddenUnitsPerLayer) + "\n")
-modfile.write( '# score' + str(score) + '\n')
-modfile.write("# numHiddenLayers " + str(numHiddenLayers) + " numHiddenUnitsPerLayer " + str(numHiddenUnitsPerLayer) + "\n")
-pyfile.write( '# score' + str(score) + '\n')
-pyfile.write("# numHiddenLayers " + str(numHiddenLayers) + " numHiddenUnitsPerLayer " + str(numHiddenUnitsPerLayer) + "\n")
-pyfile.write('import numpy\n')
-
-modfile.write( '\n#\n')
-modfile.write( 'param numHiddenLayers;\n')
-modfile.write( 'param numHiddenUnitsPerLayer;\n')
-
-datfile.write( '\n#\n')
-datfile.write( 'param numHiddenLayers := ' + str(numHiddenLayers) + ';\n')
-datfile.write( 'param numHiddenUnitsPerLayer := ' + str(numHiddenUnitsPerLayer) + ';\n')
-
-pyfile.write('\n')
-pyfile.write('numHiddenLayers = ' + str(numHiddenLayers) + '\n')
-pyfile.write('numHiddenUnitsPerLayer = ' + str(numHiddenUnitsPerLayer) + '\n')
-
-
-outputSize = len(model.layers[-1].get_weights()[0][0])
-modfile.write('\nparam y_target{i in 1..' + str(outputSize) + '};\n\n')
-
-i = 0
-for layer in model.layers:
-  weights = layer.get_weights()
-
-  modfile.write( '\n# layer-' + str(i) + '\n')
-  datfile.write( '\n# layer-' + str(i) + '\n')
-  pyfile.write('\n# layer-' + str(i) + '\n')
-
-  rows = len(weights[0])
-  columns = len(weights[0][0])
-  modfile.write( 'param rows_' + str(i) + ';\n')
-  modfile.write( 'param columns_' + str(i) + ';\n')
-  datfile.write( 'param rows_' + str(i) + ' := ' + str(rows) + ';\n')
-  datfile.write( 'param columns_' + str(i) + ' := ' + str(columns) + ';\n')
-  pyfile.write( 'rows_' + str(i) + ' = ' + str(rows) + '\n')
-  pyfile.write( 'columns_' + str(i) + ' = ' + str(columns) + '\n')
-
-  modfile.write( 'param weight_' + str(i) + '{i in 1..rows_' + str(i) + ', j in 1..columns_' + str(i) + '};\n')
-  datfile.write( 'param weight_' + str(i) + ': ')
-  for j in range(columns): datfile.write( str(j + 1) + ' ')
-  datfile.write( ':=\n')
-  print2D(datfile, weights[0])
-  pyfile.write('weight_' + str(i) + ' = [\n')
-  for weight in weights[0]:
-    pyfile.write('[ ')
-    for value in weight:
-      pyfile.write(str(value) + ', ')
-    pyfile.write('],\n')
-  pyfile.write(']\n')
-
-  modfile.write( 'param bias_columns_' + str(i) + ';\n')
-  datfile.write( 'param bias_columns_' + str(i) + ' := ' + str(len(weights[1])) + ';\n')
-  modfile.write( 'param bias_' + str(i) + '{i in 1..bias_columns_' + str(i) + '};\n')
-  datfile.write( 'param bias_' + str(i) + ' :=\n')
-  print1D(datfile, weights[1])
-  pyfile.write('\nbias_' + str(i) + ' = [ ')
-  for value in weights[1]:
-    pyfile.write(str(value) + ', ')
-  pyfile.write(']\n')
-
-  modfile.write('# activations\n')
-  if i == 0:
-    modfile.write('var x{i in 1..rows_0};\n')
-    modfile.write('subject to rangemaxx{i in 1..rows_0}: x[i] <= 1;\n')
-    modfile.write('subject to rangeminx{i in 1..rows_0}: x[i] >= 0;\n')
-
-  modfile.write('var a' + str(i) + '{i in 1..columns_' + str(i) + '};\n\n')
-
-  modfile.write('# preactivations\n')
-  modfile.write('var z' + str(i) + '{i in 1..columns_' + str(i) + '};\n\n')
-  modfile.write('# range constraints\n')
-  modfile.write('subject to rangemax' + str(i) + '{i in 1..columns_' + str(i) + '}: z' + str(i) + '[i] <= 1;\n')
-  modfile.write('subject to rangemin' + str(i) + '{i in 1..columns_' + str(i) + '}: z' + str(i) + '[i] >= -1;\n')
-  modfile.write('\n# compute preactivations\n')
-  modfile.write('subject to preactivation' + str(i) + '{i in 1..columns_' + str(i) + '}:\n')
-  if i == 0:
-    modfile.write('  z' + str(i) + '[i] = sum{j in 1..rows_0} (weight_' + str(i))
-    modfile.write('[j, i] * x[j]) + bias_' + str(i) + '[i];\n')
-  else:
-    modfile.write('  z' + str(i) + '[i] = sum{j in 1..columns_' + str(i - 1) + '} (weight_' + str(i))
-    modfile.write('[j, i] * a' + str(i - 1) + '[j]) + bias_' + str(i) + '[i];\n')
-  modfile.write('\n# compute activations\n')
-  modfile.write('subject to activation' + str(i) + '{i in 1..columns_' + str(i) + '}:\n')
-  modfile.write('  a' + str(i) + '[i] = z' + str(i) + '[i] * (tanh(100.0*z' + str(i) + '[i]) + 1) * 0.5;\n')
-
-  i = i + 1
-
-modfile.write('\n# output layer constraint\n')
-outputLayer = len(model.layers) - 1
-modfile.write('subject to zclampPositive' + str(outputLayer) + '{i in 1..columns_' + str(outputLayer) + '}:\n')
-modfile.write('  z' + str(outputLayer) + '[i] = if y_target[i] > 0 then y_target[i] else z' + str(outputLayer) + '[i];\n')
-modfile.write('subject to zclampNegative' + str(outputLayer) + '{i in 1..columns_' + str(outputLayer) + '}:\n')
-modfile.write('  z' + str(outputLayer) + '[i] <= if y_target[i] > 0 then z' + str(outputLayer) + '[i] else 0;\n')
-
-modfile.close()
-datfile.close()
-pyfile.close()
