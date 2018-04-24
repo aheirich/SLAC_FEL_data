@@ -33,7 +33,7 @@ batch_size = 128
 epochs = 1000
 initialEpoch = 0
 learningRate = 0.1
-optimizer = "SGD"
+optimizer = "Adadelta"
 direction = 'forward'
 checkpoint = None
 checkpointInterval = 1000
@@ -82,7 +82,7 @@ if direction == 'forward':
 else:
   model.add(Dense(len(FEL_INPUT.train_x[0]), activation='linear'))
 
-model.compile(loss=mse, optimizer=eval("optimizers." + optimizer),  lr=learningRate, metrics=['accuracy'])
+model.compile(loss=mse, optimizer=eval("optimizers." + optimizer + '(lr=learningRate)'), metrics=['accuracy'])
 
 
 # checkpoint
