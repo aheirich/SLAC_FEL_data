@@ -151,16 +151,16 @@ for layer in model.layers:
   modfile.write('# activations\n')
   if i == 0:
     modfile.write('var x{i in 1..rows_0};\n')
-    modfile.write('subject to rangemaxx{i in 1..rows_0}: x[i] <= 1;\n')
+    modfile.write('subject to rangemaxx{i in 1..rows_0}: x[i] <= 100;\n')
     modfile.write('subject to rangeminx{i in 1..rows_0}: x[i] >= 0;\n')
 
-  modfile.write('var a' + str(i) + '{i in 1..columns_' + str(i) + '};\n\n')
+  modfile.write('var a' + str(i) + '{i in 1..columns_' + str(i) + '} := Normal(0.0, 1.0);\n\n')
 
   modfile.write('# preactivations\n')
-  modfile.write('var z' + str(i) + '{i in 1..columns_' + str(i) + '};\n\n')
+  modfile.write('var z' + str(i) + '{i in 1..columns_' + str(i) + '} := Normal(0.0, 1.0);\n\n')
   modfile.write('# range constraints\n')
-  modfile.write('subject to rangemax' + str(i) + '{i in 1..columns_' + str(i) + '}: z' + str(i) + '[i] <= 1;\n')
-  modfile.write('subject to rangemin' + str(i) + '{i in 1..columns_' + str(i) + '}: z' + str(i) + '[i] >= -1;\n')
+  modfile.write('subject to rangemax' + str(i) + '{i in 1..columns_' + str(i) + '}: z' + str(i) + '[i] <= 100;\n')
+  modfile.write('subject to rangemin' + str(i) + '{i in 1..columns_' + str(i) + '}: z' + str(i) + '[i] >= -100;\n')
   modfile.write('\n# compute preactivations\n')
   modfile.write('subject to preactivation' + str(i) + '{i in 1..columns_' + str(i) + '}:\n')
   if i == 0:
@@ -169,18 +169,13 @@ for layer in model.layers:
   else:
     modfile.write('  z' + str(i) + '[i] = sum{j in 1..columns_' + str(i - 1) + '} (weight_' + str(i))
     modfile.write('[j, i] * a' + str(i - 1) + '[j]) + bias_' + str(i) + '[i];\n')
-  modfile.write('\n# compute activations\n')
-  modfile.write('subject to activation' + str(i) + '{i in 1..columns_' + str(i) + '}:\n')
-  modfile.write('  a' + str(i) + '[i] = z' + str(i) + '[i] * (tanh(100.0*z' + str(i) + '[i]) + 1) * 0.5;\n')
+  if i < len(model.layers) - 1:
+    modfile.write('\n# compute activations\n')
+    modfile.write('subject to activation' + str(i) + '{i in 1..columns_' + str(i) + '}:\n')
+    modfile.write('  a' + str(i) + '[i] = z' + str(i) + '[i] * (tanh(100.0*z' + str(i) + '[i]) + 1) * 0.5;\n')
 
   i = i + 1
 
-modfile.write('\n# output layer constraint\n')
-outputLayer = len(model.layers) - 1
-modfile.write('subject to zclampPositive' + str(outputLayer) + '{i in 1..columns_' + str(outputLayer) + '}:\n')
-modfile.write('  z' + str(outputLayer) + '[i] = if y_target[i] > 0 then y_target[i] else z' + str(outputLayer) + '[i];\n')
-modfile.write('subject to zclampNegative' + str(outputLayer) + '{i in 1..columns_' + str(outputLayer) + '}:\n')
-modfile.write('  z' + str(outputLayer) + '[i] <= if y_target[i] > 0 then z' + str(outputLayer) + '[i] else 0;\n')
 
 modfile.close()
 datfile.close()

@@ -8,9 +8,10 @@ import math
 import numpy
 import importlib
 
+VERBOSE = True
 
 
-model = "forward_2_2048"
+model = "ampl_model"
 if len(sys.argv) >= 2:
   model = sys.argv[1]
 readFromStdin = False
@@ -50,15 +51,35 @@ def loadData():
 
 
 
+def printVector(x, name):
+  line = name + ' = [ '
+  for value in x:
+    line = line + str(value) + ', '
+    if len(line) > 80:
+      print line + '\\'
+      line = ''
+  print line + ']'
+
+
+
 
 def activations(x, weights, biases):
+  if VERBOSE:
+    printVector(x, 'x')
   for layer in range(numLayers):
     if layer == 0:
       z = numpy.matmul(x, weights[layer]) + biases[layer]
     else:
       z = numpy.matmul(a, weights[layer]) + biases[layer]
     a = numpy.maximum(z, 0.0)
-  return a
+    if VERBOSE:
+      zname = 'z' + str(layer)
+      print '# layer', layer, 'preactivations', zname
+      printVector(z, zname)
+      aname = 'a' + str(layer)
+      print '# layer', layer, 'activations', aname
+      printVector(a, aname)
+  return z
 
 
 
@@ -107,11 +128,7 @@ if readFromStdin:
     line = line.strip()
     eval("infer ([" + line + "], weights, biases)")
 else:
-  print 'loadData'
   train_x, train_y, test_x, test_y = loadData()
-  print 'infer train'
   mse_train = verify(train_x, train_y, weights, biases)
-  print 'mse_train', mse_train
-  print 'infer test'
   mse_test = verify(test_x, test_y, weights, biases)
-  print 'mse_test', mse_test
+  print 'mse_train', mse_train, 'mse_test', mse_test

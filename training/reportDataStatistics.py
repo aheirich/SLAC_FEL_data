@@ -85,4 +85,4 @@ print ''
 print 'output_test_min =', output_test_minx
 print 'output_test_max =', output_test_maxx
 print 'output_test_mean =', output_test_mean
-print 'output_test_stddec =', output_test_stddev
+print 'output_test_stddev =', output_test_stddev
