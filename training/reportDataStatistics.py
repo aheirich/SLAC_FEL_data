@@ -69,7 +69,7 @@ print ''
 print 'input_test_min =', input_test_minx
 print 'input_test_max =', input_test_maxx
 print 'input_test_mean =', input_test_mean
-print 'input_test_stddec =', input_test_stddev
+print 'input_test_stddev =', input_test_stddev
 
 output_train_min, output_train_max = findRange(FEL_OUTPUT.train_y)
 output_train_mean, output_train_stddev, output_train_minx, output_train_maxx = computeStatistics(FEL_OUTPUT.train_y)

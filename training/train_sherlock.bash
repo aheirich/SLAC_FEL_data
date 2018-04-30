@@ -1,21 +1,19 @@
 #!/bin/bash
 #SBATCH --job-name=FELforward
-#SBATCH --time=32:00:00
+#SBATCH --time=48:00:00
 #SBATCH -p aaiken
 #SBATCH --gres gpu:1
 #SBATCH --nodes=1
 
 source ${HOME}/setup.bash
-module load py-keras
-module load py-tensorflow
 cd ${HOME}/SLAC_FEL_data/training
 
-NUM_HIDDEN_LAYERS=2
+NUM_HIDDEN_LAYERS=6
 NUM_HIDDEN_UNITS_PER_LAYER=2048
-LEARNING_RATE=0.1
-EPOCHS=2000
+LEARNING_RATE=0.0001
+EPOCHS=250000
 INITIAL_EPOCH=0
-OPTIMIZER=Adadelta
+OPTIMIZER=Adam
 DIRECTION=forward
 ROOT=$SCRATCH/checkpoint/${DIRECTION}_${OPTIMIZER}_${NUM_HIDDEN_LAYERS}_${NUM_HIDDEN_UNITS_PER_LAYER}
 
