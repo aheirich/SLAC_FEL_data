@@ -12,6 +12,7 @@ import numpy
 from keras.models import Sequential
 from keras.layers import Conv1D
 from keras.layers import Dense
+from keras.layers import BatchNormalization
 from keras.losses import mse
 from keras import optimizers
 from keras.callbacks import ModelCheckpoint
@@ -20,6 +21,7 @@ import FEL_OUTPUT_SCALED as FEL_OUTPUT
 
 repeatableResult = False
 usingTensorflow = True
+usingBatchNormalization = False
 
 if repeatableResult:
   numpy.random.seed(1)
@@ -76,6 +78,8 @@ for i in range(numHiddenLayers):
       model.add(Dense(numHiddenUnitsPerLayer, activation='relu', input_dim=len(FEL_OUTPUT.train_y[0])))
   else:
     model.add(Dense(numHiddenUnitsPerLayer, activation='relu'))
+  if usingBatchNormalization:
+    model.add(BatchNormalization(axis=1))
 
 if direction == 'forward':
   model.add(Dense(len(FEL_OUTPUT.train_y[0]), activation='linear'))

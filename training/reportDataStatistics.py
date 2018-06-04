@@ -8,6 +8,7 @@
 
 import math
 import sys
+import numpy
 
 if len(sys.argv) > 1 and sys.argv[1].startswith('scale'):
   import FEL_INPUT_SCALED as FEL_INPUT
@@ -33,9 +34,9 @@ def computeStatistics(array):
   minx = []
   maxx = []
   for i in range(len(array[0])):
-    sum.append(0.0)
-    minx.append(999999)
-    maxx.append(-999999)
+    sum.append(float(0.0))
+    minx.append(float(999999))
+    maxx.append(float(-999999))
   for row in array:
     for i in range(len(row)):
       sum[i] = sum[i] + row[i]
@@ -51,16 +52,27 @@ def computeStatistics(array):
       sumSquares[i] = sumSquares[i] + diff * diff
   stddev = []
   for value in sumSquares: stddev.append(math.sqrt(value / len(array)))
+  for i in range(len(mean)): mean[i] = float(mean[i])
+  for i in range(len(minx)): minx[i] = float(minx[i])
+  for i in range(len(maxx)): maxx[i] = float(maxx[i])
   return mean, stddev, minx, maxx
 
 
-total_mean, total_stddev, total_minx, total_maxx = computeStatistics(FEL_INPUT.train_x + FEL_INPUT.test_x + FEL_OUTPUT.train_y + FEL_OUTPUT.test_y)
+data = numpy.insert(FEL_INPUT.train_x, 1, FEL_INPUT.test_x, axis=0)
+total_input_mean, total_input_stddev, total_input_minx, total_input_maxx = computeStatistics(data)
 print ''
-print 'total_min =', total_minx
-print 'total_max =', total_maxx
-print 'total_mean =', total_mean
-print 'total_stddev =', total_stddev
+print 'total_input_min =', total_input_minx
+print 'total_input_max =', total_input_maxx
+print 'total_input_mean =', total_input_mean
+print 'total_input_stddev =', total_input_stddev
 
+data = numpy.insert(FEL_OUTPUT.train_y, 1, FEL_OUTPUT.test_y, axis=0)
+total_output_mean, total_output_stddev, total_output_minx, total_output_maxx = computeStatistics(data)
+print ''
+print 'total_output_min =', total_output_minx
+print 'total_output_max =', total_output_maxx
+print 'total_output_mean =', total_output_mean
+print 'total_output_stddev =', total_output_stddev
 
 
 input_train_min, input_train_max = findRange(FEL_INPUT.train_x)

@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=FELforward
+#SBATCH --job-name=FE6_2048
 #SBATCH --time=48:00:00
 #SBATCH -p aaiken
 #SBATCH --gres gpu:1
