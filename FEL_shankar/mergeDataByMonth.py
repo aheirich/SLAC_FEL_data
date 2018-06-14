@@ -206,6 +206,11 @@ while True:
   outputSeries.append(outputDisplay)
   nextInputs, lookAhead, controlChanged = getNext(files, currentTime, nextInputs, lookAhead)
   
+  stillOpen = False
+  for file in files:
+    if not file.closed: stillOpen = True
+  if not stillOpen: break
+  
   if (controlChanged and currentTime >= trainingStartDate) or printEveryDataPoint:
     if not first:
       dateSplit = currentTime.split('-')
