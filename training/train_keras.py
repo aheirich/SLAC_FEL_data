@@ -2,7 +2,7 @@
 #
 # train-keras.py
 #
-# numLayers numUnitsPerLayer learningRate epochs initialEpoch optimizer direction filenameRoot [checkpoint]
+# numLayers numUnitsPerLayer learningRate epochs initialEpoch optimizer filenameRoot [checkpoint]
 #
 #   2 2048 0.00001 10000 0 SGD forward modelname_2_2048_ $SCRATCH/checkpoint/forward_2_2048
 #
@@ -36,7 +36,6 @@ epochs = 1000
 initialEpoch = 0
 learningRate = 0.1
 optimizer = "Adadelta"
-direction = 'forward'
 checkpoint = None
 checkpointInterval = 1000
 
@@ -52,39 +51,26 @@ if len(argv) >= 6:
 if len(argv) >= 7:
   optimizer = argv[6]
 if len(argv) >= 8:
-  direction = argv[7]
-filenameRoot = direction + "_" + str(numHiddenLayers) + "_" + str(numHiddenUnitsPerLayer)
+  filenameRoot = argv[7]
 if len(argv) >= 9:
-  filenameRoot = argv[8]
-if len(argv) >= 10:
-  checkpoint = argv[9]
+  checkpoint = argv[8]
 
-print('numHiddenLayers', numHiddenLayers, 'unitsPerLayer', numHiddenUnitsPerLayer, 'learningRate', learningRate, 'epochs', epochs, 'initialEpoch', initialEpoch, 'direction', direction)
+print('numHiddenLayers', numHiddenLayers, 'unitsPerLayer', numHiddenUnitsPerLayer, 'learningRate', learningRate, 'epochs', epochs, 'initialEpoch', initialEpoch)
 if checkpoint is not None:
   print 'continue from checkpoint', checkpoint
-if direction == 'forward':
-  print('learning forward mapping from controls to FEL pulse energy')
-else:
-  print('learning backward mapping from FEL pulse energy to controls')
 print('output to files', filenameRoot)
 
 model = Sequential()
 
 for i in range(numHiddenLayers):
   if i == 0:
-    if direction == 'forward':
-      model.add(Dense(numHiddenUnitsPerLayer, activation='relu', input_dim=len(FEL_INPUT.train_x[0])))
-    else:
-      model.add(Dense(numHiddenUnitsPerLayer, activation='relu', input_dim=len(FEL_OUTPUT.train_y[0])))
+    model.add(Dense(numHiddenUnitsPerLayer, activation='relu', input_dim=len(FEL_INPUT.train_x[0])))
   else:
     model.add(Dense(numHiddenUnitsPerLayer, activation='relu'))
   if usingBatchNormalization:
     model.add(BatchNormalization(axis=1))
 
-if direction == 'forward':
-  model.add(Dense(len(FEL_OUTPUT.train_y[0]), activation='linear'))
-else:
-  model.add(Dense(len(FEL_INPUT.train_x[0]), activation='linear'))
+model.add(Dense(len(FEL_OUTPUT.train_y[0]), activation='linear'))
 
 model.compile(loss=mse, optimizer=eval("optimizers." + optimizer + '(lr=learningRate)'), metrics=['accuracy'])
 
@@ -97,24 +83,14 @@ if checkpoint is not None:
   model.load_weights(checkpoint)
 
 
-if direction == 'forward':
-  model.fit(FEL_INPUT.train_x, FEL_OUTPUT.train_y,
-          batch_size=batch_size,
-          epochs=epochs,
-          initial_epoch=initialEpoch,
-          callbacks=callbacks_list,
-          verbose=1,
-          validation_data=(FEL_INPUT.test_x, FEL_OUTPUT.test_y))
-  score = model.evaluate(FEL_INPUT.test_x, FEL_OUTPUT.test_y, verbose=0)
-else:
-  model.fit(FEL_OUTPUT.train_y, FEL_INPUT.train_x,
-          batch_size=batch_size,
-          epochs=epochs,
-          initial_epoch=initialEpoch,
-          callbacks=callbacks_list,
-          verbose=1,
-          validation_data=(FEL_OUTPUT.test_y, FEL_INPUT.test_x))
-  score = model.evaluate(FEL_OUTPUT.test_y, FEL_INPUT.test_x, verbose=0)
+model.fit(FEL_INPUT.train_x, FEL_OUTPUT.train_y,
+        batch_size=batch_size,
+        epochs=epochs,
+        initial_epoch=initialEpoch,
+        callbacks=callbacks_list,
+        verbose=1,
+        validation_data=(FEL_INPUT.train_x, FEL_OUTPUT.train_y))
+score = model.evaluate(FEL_INPUT.test_x, FEL_OUTPUT.test_y, verbose=0)
 print 'score', score
 
 
