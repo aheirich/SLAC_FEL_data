@@ -15,6 +15,9 @@ all:	FEL_INPUT.py duplicates_forward.log duplicates_backward.log
 FEL_INPUT.py:	mergeData.py $(SRTFILES)
 	python mergeData.py $(SRTFILES)
 
+FEL_INPUT_MONTHLY.py:	mergeDataByMonth.py $(SRTFILES)
+	python mergeDataByMonth.py $(SRTFILES)
+
 duplicates_forward.log:	FEL_INPUT.py find_duplicates.bash
 	./find_duplicates.bash
 	mv duplicates.log duplicates_forward.log
