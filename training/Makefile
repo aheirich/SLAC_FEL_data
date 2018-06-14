@@ -9,6 +9,9 @@ data_statistics.py: reportDataStatistics.py FEL_INPUT.py FEL_OUTPUT.py
 scaled_statistics.py: reportDataStatistics.py FEL_INPUT.py FEL_OUTPUT.py 
 	python reportDataStatistics.py scaled > scaled_statistics.py
 
+monthly_statistics.py: reportDataStatistics.py FEL_INPUT_MONTHLY.py FEL_OUTPUT_MONTHLY.py
+	python reportDataStatistics.py monthly > monthly_statistics.py
+
 
 clean:
 	rm -f data_statistics.py scaled_statistics.py

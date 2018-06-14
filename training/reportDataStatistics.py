@@ -10,9 +10,15 @@ import math
 import sys
 import numpy
 
+doMonthly = False
+
 if len(sys.argv) > 1 and sys.argv[1].startswith('scale'):
   import FEL_INPUT_SCALED as FEL_INPUT
   import FEL_OUTPUT_SCALED as FEL_OUTPUT
+elif len(sys.argv) > 1 and sys.argv[1].startswith('month'):
+  import FEL_INPUT_MONTHLY as FEL_INPUT
+  import FEL_OUTPUT_MONTHLY as FEL_OUTPUT
+  doMonthly = True
 else:
   import FEL_INPUT
   import FEL_OUTPUT
@@ -58,51 +64,68 @@ def computeStatistics(array):
   return mean, stddev, minx, maxx
 
 
-data = numpy.insert(FEL_INPUT.train_x, 1, FEL_INPUT.test_x, axis=0)
-total_input_mean, total_input_stddev, total_input_minx, total_input_maxx = computeStatistics(data)
-print ''
-print 'total_input_min =', total_input_minx
-print 'total_input_max =', total_input_maxx
-print 'total_input_mean =', total_input_mean
-print 'total_input_stddev =', total_input_stddev
+if doMonthly:
+  months = [ 'jul', 'aug', 'sep', 'oct', 'nov', 'dec' ]
+  for month in months:
+    mean, stddev, minx, maxx = computeStatistics(eval('FEL_INPUT.FEL_INPUT_' + month))
+    print month + '_input_min =', minx
+    print month + '_input_max =', maxx
+    print month + '_input_mean =', mean
+    print month + '_input_stddev =', stddev
+    mean, stddev, minx, maxx = computeStatistics(eval('FEL_OUTPUT.FEL_OUTPUT_' + month))
+    print month + '_output_min =', minx
+    print month + '_output_max =', maxx
+    print month + '_output_mean =', mean
+    print month + '_output_stddev =', stddev
+    print ''
 
-data = numpy.insert(FEL_OUTPUT.train_y, 1, FEL_OUTPUT.test_y, axis=0)
-total_output_mean, total_output_stddev, total_output_minx, total_output_maxx = computeStatistics(data)
-print ''
-print 'total_output_min =', total_output_minx
-print 'total_output_max =', total_output_maxx
-print 'total_output_mean =', total_output_mean
-print 'total_output_stddev =', total_output_stddev
+else:
+
+  data = numpy.insert(FEL_INPUT.train_x, 1, FEL_INPUT.test_x, axis=0)
+  total_input_mean, total_input_stddev, total_input_minx, total_input_maxx = computeStatistics(data)
+  print ''
+  print 'total_input_min =', total_input_minx
+  print 'total_input_max =', total_input_maxx
+  print 'total_input_mean =', total_input_mean
+  print 'total_input_stddev =', total_input_stddev
+
+  data = numpy.insert(FEL_OUTPUT.train_y, 1, FEL_OUTPUT.test_y, axis=0)
+  total_output_mean, total_output_stddev, total_output_minx, total_output_maxx = computeStatistics(data)
+  print ''
+  print 'total_output_min =', total_output_minx
+  print 'total_output_max =', total_output_maxx
+  print 'total_output_mean =', total_output_mean
+  print 'total_output_stddev =', total_output_stddev
 
 
-input_train_min, input_train_max = findRange(FEL_INPUT.train_x)
-input_train_mean, input_train_stddev, input_train_minx, input_train_maxx = computeStatistics(FEL_INPUT.train_x)
-print ''
-print 'input_train_min =', input_train_minx
-print 'input_train_max =', input_train_maxx
-print 'input_train_mean =', input_train_mean
-print 'input_train_stddev =', input_train_stddev
+  input_train_min, input_train_max = findRange(FEL_INPUT.train_x)
+  input_train_mean, input_train_stddev, input_train_minx, input_train_maxx = computeStatistics(FEL_INPUT.train_x)
+  print ''
+  print 'input_train_min =', input_train_minx
+  print 'input_train_max =', input_train_maxx
+  print 'input_train_mean =', input_train_mean
+  print 'input_train_stddev =', input_train_stddev
 
-input_test_min, input_test_max = findRange(FEL_INPUT.test_x)
-input_test_mean, input_test_stddev, input_test_minx, input_test_maxx = computeStatistics(FEL_INPUT.test_x)
-print ''
-print 'input_test_min =', input_test_minx
-print 'input_test_max =', input_test_maxx
-print 'input_test_mean =', input_test_mean
-print 'input_test_stddev =', input_test_stddev
+  input_test_min, input_test_max = findRange(FEL_INPUT.test_x)
+  input_test_mean, input_test_stddev, input_test_minx, input_test_maxx = computeStatistics(FEL_INPUT.test_x)
+  print ''
+  print 'input_test_min =', input_test_minx
+  print 'input_test_max =', input_test_maxx
+  print 'input_test_mean =', input_test_mean
+  print 'input_test_stddev =', input_test_stddev
 
-output_train_min, output_train_max = findRange(FEL_OUTPUT.train_y)
-output_train_mean, output_train_stddev, output_train_minx, output_train_maxx = computeStatistics(FEL_OUTPUT.train_y)
-print ''
-print 'output_train_min =', output_train_minx
-print 'output_train_max =', output_train_maxx
-print 'output_train_mean =', output_train_mean
-print 'output_train_stddev =', output_train_stddev
+  output_train_min, output_train_max = findRange(FEL_OUTPUT.train_y)
+  output_train_mean, output_train_stddev, output_train_minx, output_train_maxx = computeStatistics(FEL_OUTPUT.train_y)
+  print ''
+  print 'output_train_min =', output_train_minx
+  print 'output_train_max =', output_train_maxx
+  print 'output_train_mean =', output_train_mean
+  print 'output_train_stddev =', output_train_stddev
 
-output_test_min, output_test_max = findRange(FEL_OUTPUT.test_y)
-output_test_mean, output_test_stddev, output_test_minx, output_test_maxx = computeStatistics(FEL_OUTPUT.test_y)
-print ''
-print 'output_test_min =', output_test_minx
-print 'output_test_max =', output_test_maxx
-print 'output_test_mean =', output_test_mean
-print 'output_test_stddev =', output_test_stddev
+  output_test_min, output_test_max = findRange(FEL_OUTPUT.test_y)
+  output_test_mean, output_test_stddev, output_test_minx, output_test_maxx = computeStatistics(FEL_OUTPUT.test_y)
+  print ''
+  print 'output_test_min =', output_test_minx
+  print 'output_test_max =', output_test_maxx
+  print 'output_test_mean =', output_test_mean
+  print 'output_test_stddev =', output_test_stddev
