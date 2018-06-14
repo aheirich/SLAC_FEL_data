@@ -206,7 +206,7 @@ while True:
   outputSeries.append(outputDisplay)
   nextInputs, lookAhead, controlChanged = getNext(files, currentTime, nextInputs, lookAhead)
   
-  if (currentTime >= trainingStartDate) or printEveryDataPoint:
+  if (controlChanged and currentTime >= trainingStartDate) or printEveryDataPoint:
     if not first:
       dateSplit = currentTime.split('-')
       month = int(dateSplit[1])
